@@ -11,7 +11,6 @@ const sendOTPEmail = async (userEmail, otp) => {
     subject: "Your OTP Code",
     text: `Your OTP code is ${otp}. It will expire in 5 minutes.`,
   };
-
   try {
     let sent = await transporter.sendMail(mailOptions);
     if (sent) return true;
