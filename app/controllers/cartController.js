@@ -853,7 +853,6 @@ exports.createOrder =async (req,res)=>{
 async function generateUniqueOrderId() {
   let isUnique = false;
   let orderId;
-
   while (!isUnique) {
     const randomPart = Math.floor(100000 + Math.random() * 900000).toString(); // Generates a 6-digit random number
     orderId = `ORD${randomPart}`; // Combines "ORD" with the 6-digit random number

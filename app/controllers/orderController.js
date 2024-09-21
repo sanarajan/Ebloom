@@ -580,4 +580,3 @@ let totProdAmount=0
       res.status(500).send('Error generating invoice');
   }
 };
-
