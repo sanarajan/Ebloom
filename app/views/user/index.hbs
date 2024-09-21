@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        .login-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            margin: auto;
+        }
+
+        .login-container h2 {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .login-container .form-control {
+            margin-bottom: 15px;
+        }
+
+        .login-container .btn {
+            width: 100%;
+        }
+
+        .login-container .or {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 50px;
+            /* Padding from top */
+        }
+
+        .credits {
+            display: none;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+
+        .sso-buttons {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sso-buttons a {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="login-container">
+            <h2 class="text-center"><span class="green-e">E</span>Bloom User Login</h2>
+            <span id="errorMsg" style="color:red">
+                {{#if pwIncorrect}}
+                {{pwIncorrect}}
+                {{/if}}
+                {{#if msg}}
+                {{msg}}
+                {{/if}}
+            </span>
+            <form id="loginForm" action="/login" method="post">
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" name="email" class="form-control" id="email" required>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password *</label>
+                    <input type="password" class="form-control" name="password" id="password" required>
+                    <small class="form-text text-right"><a href="#">Forgot password?</a></small>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                <button type="submit" class="btn btn-success mb-3">LOGIN</button>
+            </form>
+            <div class="or">OR</div>
+            <div class="sso-buttons">
+                <a href="/auth/google" class="btn btn-danger">Login with Google</a>
+                {{!-- <a href="/auth/facebook" class="btn btn-primary">Login with Facebook</a> --}}
+            </div>
+            <form id="otpSendingForm" action="sendOTPVerificationEmail" method="POST">
+                <div class="form-group">
+                    <label for="mobile">Email ID *</label>
+
+                    <div class="input-group">
+                        {{!-- <div class="input-group-prepend" style="height: 2.4rem;">
+                            <span class="input-group-text">+91</span>
+                        </div> --}}
+                        <input type="email" class="form-control" name="otpEmail" id="otpEmail" required>
+                        <div class="error-message" id="otpEmailError"></div>
+                    </div>
+                </div>
+                <button type="submit" id="otpBtn" class="btn btn-success mb-3">Login With OTP</button>
+            </form>
+            <div class="text-center">if You Are New User?</div>
+            <a href="/userRegistration" class="btn btn-dark">Create New Account</a>
+
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            let isValid = true;
+
+            // Clear previous error messages
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+
+            // Validate email
+            const email = document.getElementById('email').value;
+            if (!email) {
+                isValid = false;
+                document.getElementById('emailError').textContent = 'Email is required.';
+            } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+                isValid = false;
+                document.getElementById('emailError').textContent = 'Please enter a valid email address.';
+            }
+
+            // Validate password
+            const password = document.getElementById('password').value;
+            if (!password) {
+                isValid = false;
+                document.getElementById('passwordError').textContent = 'Password is required.';
+            } else if (password.length < 6) {
+                isValid = false;
+                document.getElementById('passwordError').textContent = 'Password must be at least 6 characters long.';
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+
+        //opt sending
+        document.getElementById('otpSendingForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+            const email = document.getElementById('otpEmail').value;
+             let otpBtn =  document.getElementById('otpBtn')
+           let status = true
+            if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+                document.getElementById('otpEmailError').textContent = 'Please enter a valid email address.';
+                status =false
+            }
+        if(status){
+           
+               otpBtn.disabled = true; // Disable the button
+                 otpBtn.innerText = 'Submitting...';
+            // Make an AJAX request to the server to send OTP
+            fetch('/sendOTPVerificationEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ otpEmail: email }),
+            })
+                .then(response => response.json())
+                .then(data => {console.log(data)
+                    if (data.success) {
+                        // Redirect to OTP verification page
+                        window.location.href = `/optVerification?email=${encodeURIComponent(email)}`;
+                    } else {
+                        document.getElementById('otpEmailError').textContent = data.message || 'Error sending OTP.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('otpEmailError').textContent = 'An error occurred while sending OTP.';
+                });
+           }
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,309 @@
+<style>
+  .product-img-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .product-img {
+    max-width: 100%;
+    height: auto;
+    cursor: crosshair;
+  }
+
+  .zoomed-img {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 300px;
+    height: 300px;
+    border: 1px solid #ddd;
+    background-repeat: no-repeat;
+    background-size: 200% 200%;
+    display: none;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .thumbnail-img {
+    width: 100px;
+    height: auto;
+    cursor: pointer;
+    margin: 5px;
+  }
+
+  .thumbnail-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .error-message {
+    color: red;
+    font-weight: bold;
+  }
+
+  .wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: #baa8a8;
+    /* Transparent red */
+    cursor: pointer;
+    transition: color 0.3s ease;
+    border-color: #0000;
+  }
+
+  .wishlist-icon.active {
+    color: red;
+    /* Full red when active */
+  }
+</style>
+
+<div class="container mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/shop">Shop</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{product.productName}}</li>
+    </ol>
+  </nav>
+
+  <div class="row product-details">
+    <div class="col-md-6">
+      <div class="product-img-wrapper">
+        <i id="wishlist-icon" class="fas fa-heart wishlist-icon {{#if product.inWishlist}}active{{/if}}"
+          onclick="toggleWishlist('{{product._id}}')"></i>
+
+        <img src="/{{product.images.[0]}}" alt="Product Image" class="product-img" id="product-image">
+
+        <div class="zoomed-img" id="zoomed-image"></div>
+      </div>
+      <div class="thumbnail-container">
+        {{#each product.images}}
+        {{#if (lt @index 4)}}
+        <img src="/{{this}}" alt="Product Thumbnail" class="thumbnail-img" onclick="changeMainImage('/{{this}}')">
+        {{/if}}
+        {{/each}}
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <h1>{{product.productName}}</h1>
+      <div class="product-rating">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star-half-alt"></i>
+        <span>(4.5/5)</span>
+      </div>
+     <div class="product-pricing">
+    {{#if product.discountPercentage}}
+      <h2>Offer Price: ₹{{product.offerPrice}} <span class="text-muted"><s>₹{{product.price}}</s></span></h2>
+      <p>Discount Applied: {{product.discountPercentage}}%</p>
+    {{else}}
+      <h2>Price: ₹{{product.price}}</h2>
+    {{/if}}
+  </div>
+
+
+      <p class="highlight">Highlights:</p>
+      <ul>
+        {{#each specificationsArray}}
+        <li> {{this.value}}</li>
+        {{/each}}
+      </ul>
+
+      <div class="error-message" id="stock-status">
+        <!-- Stock status will be displayed here -->
+      </div>
+
+      <div class="mb-3">
+        <button id="add-to-cart-btn" class="btn btn-primary" {{#if (eq product.quantity 0)}}disabled{{/if}}>Add to
+          Cart</button>
+        <button id="add-to-wishlist-btn" class="btn btn-secondary">Add to Wishlist</button>
+      </div>
+
+      <p><strong>Available Stock:</strong> {{product.quantity}}</p>
+      <p><strong>Reviews:</strong> 120 Reviews</p>
+      <p><strong>Offer Applied:</strong> {{product.discountPercentage}}% off with code SAVE ₹{{product.saved }}</p>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h3>Customer Reviews</h3>
+    <div class="review">
+      <p><strong>Divya</strong> - <span class="text-muted">Jan 1, 2024</span></p>
+      <div class="product-rating">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star-half-alt"></i>
+      </div>
+      <p>Great product! Highly recommend.</p>
+    </div>
+    <div class="review">
+      <p><strong>Sana</strong> - <span class="text-muted">Jan 2, 2024</span></p>
+      <div class="product-rating">
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+        <i class="fas fa-star"></i>
+      </div>
+      <p>Excellent quality and fast shipping.</p>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h3>Related Products</h3>
+    <div class="row related-products">
+      {{#each relatedProducts}}
+      <div class="col-md-3">
+        <div class="card">
+          <img src="/{{this.images.[0]}}" class="card-img-top" alt="Related Product">
+          <div class="card-body">
+            <h5 class="card-title">{{this.productName}}</h5>
+            <p class="card-text">₹{{this.price}} </p>
+            <a href="/productDetails/{{this._id}}" class="btn btn-primary">View Details</a>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+</div>
+
+<script>
+  const stockStatus = document.getElementById('stock-status');
+  const stockQuantity = {{ product.quantity }};
+
+  if (stockQuantity === 0) {
+    stockStatus.innerText = 'Sold Out';
+    stockStatus.classList.add('error-message');
+  } else if (stockQuantity < 10) {
+    stockStatus.innerText = 'Low Stock';
+    stockStatus.classList.add('error-message');
+  } else {
+    stockStatus.innerText = '';
+    stockStatus.classList.remove('error-message');
+  }
+
+  const productImage = document.getElementById('product-image');
+  const zoomedImage = document.getElementById('zoomed-image');
+
+  productImage.addEventListener('mousemove', (e) => {
+    const rect = productImage.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const offsetX = (x / productImage.width) * 100;
+    const offsetY = (y / productImage.height) * 100;
+
+    zoomedImage.style.backgroundImage = `url(${productImage.src})`;
+    zoomedImage.style.backgroundSize = `${productImage.width * 2}px ${productImage.height * 2}px`; // Zoom in size
+    zoomedImage.style.backgroundPosition = `-${offsetX * 7}px -${offsetY * 7}px`; // Adjust for zoom
+  });
+
+  productImage.addEventListener('mouseleave', () => {
+    zoomedImage.style.display = 'none';
+  });
+
+  productImage.addEventListener('mouseenter', () => {
+    zoomedImage.style.display = 'block';
+  });
+
+  // JavaScript to change main image
+  function changeMainImage(imageSrc) {
+    productImage.src = `${imageSrc}`;
+    zoomedImage.style.backgroundImage = `url(${productImage.src})`;
+  }
+
+  document.getElementById('add-to-cart-btn').addEventListener('click', async () => {
+    try {
+      const response = await fetch('/addToCart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId: '{{product._id}}', quantity: 1 })
+      });
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        stockStatus.innerText = data.message;
+        stockStatus.classList.add('error-message');
+      } else {
+        stockStatus.innerText = 'Added to Cart!';
+        stockStatus.classList.remove('error-message');
+        window.location.href = '/yourCart';
+      }
+    } catch (error) {
+      stockStatus.innerText = 'Error adding to cart';
+      stockStatus.classList.add('error-message');
+    }
+  });
+
+  //add to wishlist
+  document.getElementById('add-to-wishlist-btn').addEventListener('click', async () => {
+    const stockStatus = document.getElementById('stock-status');
+    try {
+      const response = await fetch('/addToWishlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId: '{{product._id}}' }) // Sending the product ID to the server
+      });
+      const data = await response.json();
+
+      if (response.status !== 200) {
+        stockStatus.innerText = data.message;
+        stockStatus.classList.add('error-message');
+      } else {
+        stockStatus.innerText = 'Added to Wishlist!';
+        stockStatus.classList.remove('error-message');
+      }
+    } catch (error) {
+      stockStatus.innerText = 'Error adding to wishlist';
+      stockStatus.classList.add('error-message');
+    }
+  });
+
+
+  async function toggleWishlist(productId) {
+    const wishlistIcon = document.getElementById('wishlist-icon');
+    const isActive = wishlistIcon.classList.contains('active');
+
+    try {
+      const response = await fetch(`/addToWishlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId })
+      });
+
+      const data = await response.json();
+
+      if (response.status === 200) {
+        if (isActive) {
+          wishlistIcon.classList.remove('active');
+          wishlistIcon.style.color = '#baa8a8'; // Make icon transparent
+        } else {
+          wishlistIcon.classList.add('active');
+          wishlistIcon.style.color = 'red'; // Make icon fully red
+        }
+      } else {
+        console.error('Error:', data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+
+</script>

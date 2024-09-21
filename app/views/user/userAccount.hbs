@@ -1,0 +1,232 @@
+<main role="main" class="content col-md-9">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Profile Information</h1>
+    </div>
+    <div class="container">
+        <!-- Profile Information Fields -->
+        <input type="hidden" id="first" value="{{firstName}}">
+        <input type="hidden" id="last" value="{{lastName}}">
+        <input type="hidden" id="hidPhone" value="{{userData.phoneNumber}}">
+
+        <input type="hidden" id="_id" name="_id" value="{{userData._id}}">
+        <form id="nameForm">
+            <div class="edit-section" id="profile-info">
+                <h4>Profile Info <a href="#" class="btn btn-link" id="profileEdit" onclick="editProfile()">Edit</a></h4>
+                <div id="name-section" class="d-flex">
+                    <input type="text" class="form-control mr-2" id="firstName" value="{{firstName}}" disabled>
+                    <input type="text" class="form-control" id="lastName" value="{{lastName}}" disabled>
+
+                </div>
+                <span id="name_error" style="color:red"></span>
+                <br>
+                <button type="button" class="btn btn-primary mt-2" id="nameSave" style="display:none;"
+                    onclick="saveName()">Save</button>
+            </div>
+        </form>
+        <div class="edit-section" id="email-section">
+            <h4>Email <a href="#" class="btn btn-link" id="emailEdit" onclick="editEmail()">Edit</a></h4>
+            <input type="email" class="form-control" id="email" value="{{userData.email}}" disabled>
+            <button type="button" class="btn btn-primary mt-2" id="emailSave" style="display:none;"
+                onclick="saveEmail()">Save</button>
+        </div>
+        <div class="edit-section" id="phone-section">
+            <h4>Phone Number <a href="#" class="btn btn-link" id="phoneEdit" onclick="editPhoneNumber()">Edit</a></h4>
+            <input type="text" class="form-control" id="phoneNumber" value="{{userData.phoneNumber}}" disabled>
+            <span id="phone_error"  style="color:red"></span>
+            <br>
+            <button type="button" class="btn btn-primary mt-2" id="phoneSave" style="display:none;"
+                onclick="savePhoneNumber()">Save</button>
+        </div>
+    </div>
+</main>
+</div>
+</div>
+
+
+<script>
+    function editProfile() {
+        document.getElementById('firstName').disabled = false;
+        document.getElementById('lastName').disabled = false;
+        document.getElementById('nameSave').style.display = 'inline-block';
+        document.getElementById('profileEdit').textContent = 'Cancel';
+        document.getElementById('profileEdit').setAttribute('onclick', 'cancelProfile()');
+    }
+
+    function cancelProfile() {
+        const first = document.getElementById("first").value
+        const last = document.getElementById("last").value
+        document.getElementById('firstName').value = first
+        document.getElementById('lastName').value = last
+        document.getElementById("name_error").textContent = ''
+        document.getElementById('firstName').disabled = true;
+        document.getElementById('lastName').disabled = true;
+        document.getElementById('nameSave').style.display = 'none';
+        document.getElementById('profileEdit').textContent = 'Edit';
+        document.getElementById('profileEdit').setAttribute('onclick', 'editProfile()');
+    }
+
+    async function saveName() {
+        let _id = document.getElementById("_id").value.trim();
+        const firstName = document.getElementById("firstName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+        const name_error = document.getElementById("name_error")
+        name_error.textContent = ""
+        // Validate fields
+        if (!firstName || !lastName) {
+            name_error.textContent = 'Both first name and last name are required.'
+            return;
+        }
+
+        // Additional validation (e.g., name length or character checks) can be added here
+        if (firstName.length < 2) {
+            name_error.textContent = 'Both names should be at least 2 characters long.'
+            return;
+        }
+
+        try {
+            fetch('/editName', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    _id: _id,
+                    firstName: firstName,
+                    lastName: lastName
+                })
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        document.getElementById("first").value = firstName
+                        document.getElementById("last").value = lastName
+
+                        // Use SweetAlert for success
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Name updated successfully.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            cancelProfile(); // Call your function to handle profile cancel
+                        });
+                    } else {
+                        // Use SweetAlert for error
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Error updating name: ' + result.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the category.');
+                });
+        } catch (error) {
+            // Handle fetch error
+            alert('An error occurred while saving the name: ' + error.message);
+        }
+    }
+
+    function editEmail() {
+        document.getElementById('email').disabled = false;
+        document.getElementById('emailSave').style.display = 'inline-block';
+        document.getElementById('emailEdit').textContent = 'Cancel';
+        document.getElementById('emailEdit').setAttribute('onclick', 'cancelEmail()');
+    }
+
+    function cancelEmail() {
+        document.getElementById('email').disabled = true;
+        document.getElementById('emailSave').style.display = 'none';
+        document.getElementById('emailEdit').textContent = 'Edit';
+        document.getElementById('emailEdit').setAttribute('onclick', 'editEmail()');
+    }
+
+    function saveEmail() {
+        // Add your save logic here (e.g., AJAX call to save the updated email)
+        cancelEmail();
+    }
+
+    function editPhoneNumber() {
+        document.getElementById('phoneNumber').disabled = false;
+        document.getElementById('phoneSave').style.display = 'inline-block';
+        document.getElementById('phoneEdit').textContent = 'Cancel';
+        document.getElementById('phoneEdit').setAttribute('onclick', 'cancelPhoneNumber()');
+    }
+
+    function cancelPhoneNumber() {
+       const hidPhone =  document.getElementById('hidPhone').value;
+       document.getElementById('phoneNumber').value=hidPhone
+        document.getElementById('phone_error').textContent='' 
+        document.getElementById('phoneNumber').disabled = true;
+        document.getElementById('phoneSave').style.display = 'none';
+        document.getElementById('phoneEdit').textContent = 'Edit';
+        document.getElementById('phoneEdit').setAttribute('onclick', 'editPhoneNumber()');
+    }
+
+
+    async function savePhoneNumber() {
+        const phoneNumber = document.getElementById("phoneNumber").value.trim();
+        let _id = document.getElementById("_id").value.trim();
+
+        const phoneError = document.getElementById("phone_error");
+        phoneError.textContent = "";
+
+        // Validate phone number
+        if (!phoneNumber) {
+            phoneError.textContent = 'Phone number is required.';
+            return;
+        }
+
+        // Check if the phone number is valid (e.g., 10 digits for simplicity)
+        const phoneRegex = /^\d{10}$/;
+        if (!phoneRegex.test(phoneNumber)) {
+            phoneError.textContent = 'Phone number must be 10 digits long.';
+            return;
+        }
+
+        try {
+            const response = await fetch('/editPhoneNumber', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    phoneNumber: phoneNumber, userId: _id
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById('hidPhone').value=phoneNumber
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Phone number updated successfully.',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    cancelPhoneNumber() // Call your function to handle profile cancel
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Error updating phone number: ' + result.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'An error occurred while saving the phone number: ' + error.message,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+</script>

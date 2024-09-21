@@ -1,0 +1,139 @@
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Users</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item">Tables</li>
+        <li class="breadcrumb-item active">Data</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Users</h5>
+
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  <th>
+                    Name
+                  </th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#if data}}
+                {{#each data}}
+                <tr>
+                  <td>{{this.username}}</td>
+                  <td>{{this.email}}</td>
+                  <td>{{this.phoneNumber}}</td>
+                  <td id="status{{_id}}">{{ternary (eq this.isActive true) "Active" "Inactive"}}</td>
+                  {{#if this.isActive}}
+                  <td>
+                    <span title="Active" id="block" onclick="confirmBlock(this, '{{this._id}}')" class="badge bg-danger"
+                      style="cursor:pointer">Block</span>
+                  </td>
+                  {{else}}
+                  <td>
+
+                    <span title="Inactive" id="unblock" onclick="confirmBlock(this, '{{this._id}}')"
+                      class="badge bg-success" style="cursor:pointer">Unblock</span>
+
+                  </td>
+                  {{/if}}
+
+                </tr>
+                {{/each}}
+                {{/if}}
+
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main><!-- End #main -->
+<script>
+  function confirmBlock(element, userId) {
+    var task = element.id;
+
+    swal({
+      title: "Are you sure?",
+      text: `Are you sure you want to ${task} this user?`,
+      icon: "warning",
+      buttons: {
+        cancel: {
+          text: "Cancel",
+          value: null,
+          visible: true,
+          className: "",
+          closeModal: true,
+        },
+        confirm: {
+          text: "Yes, do it!",
+          value: true,
+          visible: true,
+          className: "",
+          closeModal: true
+        }
+      }
+    }).then((willDoIt) => {
+      if (willDoIt) {
+        fetch('/admin/blockUser', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id: userId, task: task })
+        })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.success) {
+              if (data.block === "block") {
+                element.classList.remove('bg-success');
+                element.classList.add('bg-danger');
+                document.getElementById("status" + userId).textContent = "Active";
+              } else {
+                element.classList.remove('bg-danger');
+                element.classList.add('bg-success');
+                document.getElementById("status" + userId).textContent = "Inactive";
+              }
+              element.id = data.block;
+              element.textContent = data.block;
+              console.log('User status updated successfully');
+            } else {
+              console.error('Error updating user status:', data.message);
+              swal('Error', 'Error updating user status: ' + data.message, 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            swal('Error', 'An error occurred while updating the user status.', 'error');
+          });
+      }
+    });
+  }
+
+</script>

@@ -1,0 +1,110 @@
+<style>
+        body {
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        } 
+
+     
+
+       
+
+        .green-e {
+            color: #4CAF50; /* Green color */
+        }
+
+        .sidebar {
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+        }
+
+        .sidebar .nav-link.active {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .edit-section {
+            margin-bottom: 20px;
+        }
+
+        .edit-section h4 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .edit-section input {
+            margin-bottom: 10px;
+        }
+
+        .edit-section button {
+            display: none;
+        }
+
+        .edit-mode input {
+            background-color: #fff;
+        }
+
+        .edit-mode .edit-button {
+            display: none;
+        }
+
+        .edit-mode .save-button {
+            display: inline-block;
+        }
+    </style>
+   
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar">
+                <div class="profile">
+                    <h4 id="profile-name">{{username}}</h4>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-user"></i> Account Settings
+                        </a>
+                        <ul class="nav flex-column ml-3">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="/profile"><i class="fas fa-user-circle"></i> Profile Information</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/address"><i class="fas fa-map-marker-alt"></i> Manage Addresses</a>
+                            </li>
+                            {{!-- <li class="nav-item">
+                                <a class="nav-link" href="#"><i class="fas fa-id-card"></i> PAN Card Information</a>
+                            </li> --}}
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/myOrders"><i class="fas fa-box"></i> Your Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/yourCart"><i class="fas fa-shopping-cart"></i> Your Cart</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/whishlist"><i class="fas fa-heart"></i> Your Wishlist</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/changePassword"><i class="fas fa-key"></i> Change Password</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/wallet"><i class="fas fa-tags"></i> Wallet</a>
+                    </li>
+                </ul>
+            </div>

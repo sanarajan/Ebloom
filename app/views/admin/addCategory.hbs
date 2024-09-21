@@ -1,0 +1,88 @@
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Add Category</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item">Forms</li>
+        <li class="breadcrumb-item active">Layouts</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-10">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"></h5>
+                
+                        {{#if errorMessage}}
+                        <div class="alert alert-danger"> {{errorMessage}}</div>
+
+                        {{/if}}
+            <!-- Horizontal Form -->
+            <form id="categoryForm" action="/admin/addCategory" method="post">
+              <div class="row mb-3">
+                <label for="inputEmail3" class="col-sm-3 col-form-label">Category Name</label>
+                <div class="col-sm-9">
+                  <input type="text" name="categoryName" id="categoryname" class="form-control">
+                  <div id="categoryname_error" style="color: red;"></div>
+
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputEmail3" class="col-sm-3 col-form-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea class="form-control" name="description" id="description"></textarea>
+                  <div id="description_error" style="color: red;"></div>
+                </div>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </form><!-- End Horizontal Form -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main><!-- End #main -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function categoryValidation(event) {
+      const categoryname = document.getElementById('categoryname').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const categoryname_error = document.getElementById('categoryname_error');
+      const description_error = document.getElementById('description_error');
+      if (!categoryname) {
+        categoryname_error.textContent = "Category Name Required";
+        event.preventDefault();
+        return false;
+      }
+      if (!description) {
+        description_error.textContent = "Description Required";
+        event.preventDefault();
+        return false;
+      }
+      return true;
+    }
+
+    document.getElementById('categoryForm').addEventListener('submit', categoryValidation);
+  });
+
+  document.addEventListener("DOMContentLoaded", vanishError);
+  function vanishError() {
+    const inputs = document.querySelectorAll("input,textarea");
+    inputs.forEach((input) => {
+      input.addEventListener("keyup", function (event) {
+        const target = event.target;
+        const errorElement = document.getElementById(`${target.id}_error`);
+        errorElement.innerHTML = "";
+      });
+    });
+  }
+</script>

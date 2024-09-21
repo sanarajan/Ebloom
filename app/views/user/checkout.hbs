@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .header {
+            width: 100%;
+        }
+
+        .footer {
+            background: #000;
+            color: #fff;
+            padding: 15px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .content-container {
+            display: flex;
+            padding: 20px;
+            margin: 0 10px;
+            flex: 1;
+        }
+
+        .left-section {
+            flex: 70%;
+            padding-right: 20px;
+        }
+
+        .right-section {
+            flex: 30%;
+            padding-left: 20px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .address-section,
+        .cart-details-section {
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .address-section h4,
+        .cart-details-section h4,
+        .right-section h4 {
+            margin-top: 0;
+            font-size: 26px;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+
+        .address-list {
+            margin-bottom: 20px;
+        }
+
+        .address-item {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .address-item input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .deliver-here-button,
+        .edit-address-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: auto;
+            margin-right: 15px;
+        }
+
+        .deliver-here-button:hover,
+        .edit-address-button:hover {
+            background-color: #0056b3;
+        }
+
+        .edit-here-button {
+            margin-left: auto;
+
+
+        }
+
+        .add-address-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 18px;
+            text-align: center;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .add-address-button:hover {
+            background-color: #0056b3;
+        }
+
+        .new-address-form {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .new-address-form input,
+        .new-address-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .new-address-form button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 18px;
+            display: block;
+            width: 100%;
+        }
+
+        .new-address-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .cart-item {
+            display: flex;
+            border-radius: 8px;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin-bottom: 20px;
+            align-items: center;
+            height: 200px;
+        }
+
+        .cart-item img {
+            max-width: 150px;
+            max-height: 150px;
+            margin-right: 20px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .cart-item-details {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .product-name {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .product-specification {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .product-status {
+            font-size: 18px;
+            color: #d9534f;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .product-delivery {
+            font-size: 16px;
+            color: #777;
+        }
+
+
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .quantity-controls button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+
+        .quantity-controls button:hover {
+            background-color: #0056b3;
+        }
+
+        .quantity-controls span {
+            margin: 0 10px;
+            font-size: 18px;
+        }
+
+        .cancel-button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: auto;
+        }
+
+        .cancel-button:hover {
+            background-color: #c82333;
+        }
+
+        .place-order-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 15px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 20px;
+            display: block;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .place-order-button:hover {
+            background-color: #0056b3;
+        }
+
+        .summary-detail {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .summary-detail span {
+            float: right;
+            font-weight: bold;
+        }
+
+        .button-container {
+            margin-left: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <!-- Your header content here -->
+    </header>
+
+    <div class="content-container">
+        <div class="left-section">
+            <div class="address-section">
+                <h4>Select Delivery Address</h4>
+                <div class="address-list" id="addressList">
+                    {{#each addresses}}
+                    <div class="address-item" id="address{{this._id}}">
+                        <input class="checkAddr" type="radio" name="address" id="radioAddress{{this._id}}"
+                            value="{{this._id}}" {{#if @last}}checked{{/if}}
+                            onclick="enableDeliverButton('{{this._id}}')">
+                        <label for="radioAddress{{this._id}}">
+                            <strong>{{this.house}}</strong><br>
+                            {{this.place}}, {{this.city}}<br>
+                            {{this.district}}, {{this.state}} {{this.pincode}}
+                        </label>
+
+                        <div class="button-container" id="buttonContainer{{this._id}}"></div>
+
+
+                    </div>
+
+                    <div class="new-address-form editForm" id="editAddressForm{{this._id}}" style="display:none">
+                        <input type="text" id="editHouse-{{this._id}}" placeholder="house" value="{{this.house}}">
+                        <input type="text" id="editPlace-{{this._id}}" placeholder="Place" value="{{this.place}}">
+                        <input type="text" id="editCity-{{this._id}}" placeholder="City" value="{{this.city}}">
+                        <input type="text" id="editDistrict-{{this._id}}" placeholder="District"
+                            value=" {{this.district}}">
+                        <input type="text" id="editState-{{this._id}}" placeholder="State" value="{{this.state}}">
+                        <input type="text" id="editPincode-{{this._id}}" placeholder="Pin Code"
+                            value="{{this.pincode}}">
+                        <div class="row">
+                            <button class="btn btn-secondary" style="width:100px;margin-right:10px"
+                                onclick="updateAddress('{{this._id}}')">Save </button>
+                            <button style="width:100px;background-color:#777"
+                                onclick="cancelEdit('{{this._id}}')">cancel</button>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+                {{!-- edit address --}}
+
+                {{!-- end edit address --}}
+
+                <button class="add-address-button" onclick="toggleNewAddressForm()">Add New Address</button>
+                <div class="address-form-section" id="add-address-form" style="display:none">
+                    <h4>Add New Address</h4>
+                    <div class="form-row" id="newAddressForm">
+                        <div class="form-group newAddess">
+                            <label for="newHouse">House</label>
+                            <input type="text" class="form-control" id="newHouse" placeholder="Enter house">
+                            <small id="houseError" class="form-text  error"></small>
+                        </div>
+                        <div class="form-group newAddess">
+                            <label for="newPlace">Place</label>
+                            <input type="text" class="form-control " id="newPlace" placeholder="Enter place">
+                        </div>
+                        <div class="form-group newAddess">
+                            <label for="newCity">City</label>
+                            <input type="text" class="form-control " id="newCity" placeholder="Enter city">
+                        </div>
+                        <div class="form-group newAddess">
+                            <label for="newDistrict">District</label>
+                            <input type="text" class="form-control " id="newDistrict" placeholder="Enter district">
+                        </div>
+                        <div class="form-group newAddess">
+                            <label for="newState">State</label>
+                            <input type="text" class="form-control " id="newState" placeholder="Enter state">
+                        </div>
+                        <div class="form-group newAddess">
+                            <label for="newPincode">Pincode</label>
+                            <input type="text" class="form-control " id="newPincode" placeholder="Enter pincode">
+                            <small id="pincodeError" class="form-text error"></small>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveAddress()">Save</button>
+                    <button class="btn btn-secondary" onclick="cancelAddAddress()">Cancel</button>
+                </div>
+            </div>
+
+            <div class="cart-details-section" id="cartDetailsSection" style="display: block;">
+
+                <h4>Your Cart</h4>
+
+                {{#each cartItems}}
+                {{#each products}}
+                <div class="cart-item">
+                    {{#if product.thumbnailPaths.length}}
+                    {{!-- {{#each product.thumbnailPaths}} --}}
+                    <img src="{{product.thumbnailPaths.[0]}}" alt="{{../product.productName}}" />
+                    {{!-- {{/each}} --}}
+                    {{else}}
+                    <img src="default-product-image.jpg" alt="Default Image">
+                    {{/if}}
+                    <div class="cart-item-details">
+                        <div class="product-name">{{product.productName}}</div>
+                        <div class="product-specification">Category: {{product.subCategoryId}}</div>
+                        <!-- Adjust as needed -->
+                        <div class="product-status">Delivered on {{this.deliveredOn}}</div> <!-- Adjust if necessary -->
+                        <div class="product-price">₹{{product.price}}</div>
+                        <div class="product-delivery">Your item has been delivered</div>
+                        {{!-- <div class="quantity-controls">
+                            <button onclick="changeQuantity({{product._id}}, -1)">-</button>
+                            <span>{{this.quantity}}</span>
+                            <button onclick="changeQuantity({{product._id}}, 1)">+</button>
+                            <button class="remove-button" onclick="removeItem({{product._id}})">Remove</button>
+
+                        </div> --}}
+                    </div>
+                </div>
+                {{/each}}
+                {{/each}}
+                <!-- Add more cart items as needed -->
+                <button class="place-order-button" onclick="placeOrder()" id="placeOrderButton"
+                    style="display: none;">Place Order</button>
+            </div>
+        </div>
+
+        <div class="right-section">
+            <h4>Cart Summary {{itemCount}}</h4>
+            <div class="summary-detail">Price: <span>₹{{totalPrice}}</span></div>
+            <div class="summary-detail">Discount: <span>₹{{totalDiscount}}</span></div>
+            <div class="summary-detail">Delivery Charges: <span>₹{{deliveryCharges}}</span></div>
+            <div class="summary-detail">Secured Packaging Fee: <span>₹{{packagingFee}}</span></div>
+            <div class="summary-detail">Amount Saved: <span>₹{{totalSavings}}</span></div>
+
+            <div class="summary-detail "> <strong>Total Amount:</strong> <span>₹{{totalAmount}}</span></div>
+        </div>
+    </div>
+    <form id="priceSummeryForm" action="/payment" method="POST">
+        <input type="hidden" name="_id" id="_id" value="{{userId}}">
+        <input type="hidden" name="Price" value="{{totalPrice}}">
+        <input type="hidden" name="discount" value="0">
+        <input type="hidden" name="deliveryCharges" value="{{deliveryCharges}}">
+        <input type="hidden" name="packagingFee" value="{{packagingFee}}">
+        <input type="hidden" name="totalSavings" value="0">
+        <input type="hidden" name="totalAmount" value="{{totalAmount}}">
+        <input type="hidden" name="quantity" value="{{quantity}}">
+        <input type="hidden" name="addressSelected" id="addressSelected" value="">
+
+    </form>
+
+    <footer class="footer">
+        <!-- Your footer content here -->
+    </footer>
+
+    <script>
+        let addresses = {{{ json addresses }}};
+
+        function selectAddress(addressId) {
+            // Hide other addresses and show selected address details
+            document.querySelectorAll('.address-item').forEach(item => item.style.display = 'none');
+            document.getElementById('address' + addressId).style.display = 'block';
+            document.getElementById('cartDetailsSection').style.display = 'block';
+            document.getElementById('placeOrderButton').style.display = 'block';
+            document.getElementById('editButton' + addressId).style.display = 'block';
+            document.getElementById('deliverHereButton' + addressId).style.display = 'none';
+            document.getElementById('addressSelected').value = addressId;
+
+
+            cancelEdit()
+            cancelAddAddress()
+            //  document.getElementById('address' + addressId).textContent
+        }
+
+        function toggleNewAddressForm() {
+            cancelEdit()
+            const form = document.getElementById('add-address-form');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+
+        }
+
+        async function saveAddress() {
+            const newHouse = document.getElementById('newHouse').value.trim();
+            const newPlace = document.getElementById('newPlace').value.trim();
+            const newCity = document.getElementById('newCity').value.trim();
+            const newDistrict = document.getElementById('newDistrict').value.trim();
+            const newState = document.getElementById('newState').value.trim();
+            const newPincode = document.getElementById('newPincode').value.trim();
+
+            // Validation
+            clearErrors();
+
+            if (!newHouse || !newPlace || !newCity || !newDistrict || !newState || !newPincode) {
+                showError('houseError', 'All fields are required.');
+
+                return;
+            }
+
+            if (hasSpecialCharacters(newHouse) || hasSpecialCharacters(newPlace) || hasSpecialCharacters(newCity) ||
+                hasSpecialCharacters(newDistrict) || hasSpecialCharacters(newState)) {
+                showError('houseError', 'Address fields should not contain special characters.');
+                //  Swal.fire({
+                //    icon: 'error',
+                //    title: 'Validation Error',
+                //     text: 'Address fields should not contain special characters.',
+                //  });
+                return;
+            }
+
+            if (!isValidPincode(newPincode)) {
+                showError('pincodeError', 'Pincode must be a 6-digit number.');
+
+                return;
+            }
+
+            try {
+                // Sending the data to the server
+                const response = await fetch('/addAddress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: document.getElementById('_id').value, // Assuming you have a hidden input for userId
+                        house: newHouse,
+                        place: newPlace,
+                        city: newCity,
+                        district: newDistrict,
+                        state: newState,
+                        pincode: newPincode
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Success: Update the address list with the result from the server
+                    addresses.push(result.address);
+                    renderAddresses();
+                    clearAddAddressForm();
+                    cancelAddAddress();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Address added successfully.',
+                    });
+                } else {
+                    // Handle errors (from the server)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: `Error: ${result.message}`,
+                    });
+                }
+            } catch (error) {
+                // Handle network or server errors
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while saving the address.',
+                });
+            }
+        }
+        function editAddress(addressId) {
+
+            const editForm = document.getElementById('editAddressForm' + addressId);
+            if (editForm) {
+                editForm.style.display = 'block';
+            }
+            cancelAddAddress()
+        }
+        function cancelEdit() {
+
+
+
+            document.querySelectorAll('.editForm').forEach(x => {
+                x.style.display = 'none'; // Clear all existing buttons
+            });
+        }
+
+        async function updateAddress(id) {
+
+            const house = document.getElementById(`editHouse-${id}`).value.trim();
+            const place = document.getElementById(`editPlace-${id}`).value.trim();
+            const city = document.getElementById(`editCity-${id}`).value.trim();
+            const district = document.getElementById(`editDistrict-${id}`).value.trim();
+            const state = document.getElementById(`editState-${id}`).value.trim();
+            const pincode = document.getElementById(`editPincode-${id}`).value.trim();
+
+            // Validation
+            clearErrors();
+
+            if (!house || !place || !city || !district || !state || !pincode) {
+                showError(`editHouseError-${id}`, 'All fields are required.');
+                return;
+            }
+
+            if (hasSpecialCharacters(house) || hasSpecialCharacters(place) || hasSpecialCharacters(city) ||
+                hasSpecialCharacters(district) || hasSpecialCharacters(state)) {
+                showError(`editHouseError-${id}`, 'Address fields should not contain special characters.');
+                return;
+            }
+
+            if (!isValidPincode(pincode)) {
+                showError(`editPincodeError-${id}`, 'Pincode must be a 6-digit number.');
+                return;
+            }
+
+            try {
+                // Sending the data to the server
+                const response = await fetch('/updateAddress', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id,
+                        house,
+                        place,
+                        city,
+                        district,
+                        state,
+                        pincode
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const { address, message } = result;
+                    // Success: Update the address list with the result from the server
+                    const index = addresses.findIndex(addr => addr._id === id);
+                    if (index !== -1) {
+                        addresses[index] = result.address; // Update the address in the array
+                        renderAddresses(id); // Re-render the addresses
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Address updated successfully.',
+                        });
+                    }
+                } else {
+                    // Handle errors (from the server)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: `Error: ${result.message}`,
+                    });
+                }
+            } catch (error) {
+                // Handle network or server errors
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while updating the address.',
+                });
+            }
+        }
+
+        function renderAddresses(id = "") {
+
+            let chek = ''
+            if (!id) {
+                chek = addresses[addresses.length - 1]._id
+            } else {
+                chek = id
+            }
+
+            const addressList = document.getElementById('addressList');
+            addressList.innerHTML = ''; // Clear the existing content
+
+            addresses.forEach(address => {
+
+                // Create the address item container
+                const addressItem = document.createElement('div');
+                addressItem.className = 'address-item';
+                addressItem.id = `address${address._id}`;
+                // Create the radio input and label
+                addressItem.innerHTML = `
+            <input class="checkAddr" type="radio" name="address" id="radioAddress${address._id}" value="${address._id}"
+                ${address._id === chek ? 'checked' : ''} 
+                onclick="enableDeliverButton('${address._id}')">
+            <label for="radioAddress${address._id}">
+                <strong>${address.house}</strong><br>
+                ${address.place}, ${address.city}<br>
+                ${address.district}, ${address.state} ${address.pincode}
+            </label>
+             <div class="button-container" id="buttonContainer${address._id}">
+            <button class="deliver-here-button" id="deliverHereButton${address._id}"
+                onclick="selectAddress('${address._id}')" 
+                ${address._id === chek ? '' : 'style="display:none"'}>Deliver Here</button>
+            <button class="edit-here-button" id="editButton${address._id}" 
+                onclick="editAddress('${address._id}')" 
+                ${address._id === chek ? '' : 'style="display:none"'}>Edit</button>
+                 <button class="change-here-button" id="changeButton{{this._id}}"
+                            onclick="changeAddress('{{this._id}}')" style="display:none">Change</button>
+                 </div>
+            <div class="new-address-form editForm" id="editAddressForm${address._id}" style="display:none">
+                <input type="text" id="editHouse-${address._id}" placeholder="House" value="${address.house}">
+                <input type="text" id="editPlace-${address._id}" placeholder="Place" value="${address.place}">
+                <input type="text" id="editCity-${address._id}" placeholder="City" value="${address.city}">
+                <input type="text" id="editDistrict-${address._id}" placeholder="District" value="${address.district}">
+                <input type="text" id="editState-${address._id}" placeholder="State" value="${address.state}">
+                <input type="text" id="editPincode-${address._id}" placeholder="Pincode" value="${address.pincode}">
+                <button onclick="updateAddress('${address._id}')">Save Address</button>
+            </div>
+        `;
+
+                // Append the created address item to the address list
+                addressList.appendChild(addressItem);
+            });
+        }
+
+
+        // Helper functions (for completeness)
+        function clearErrors() {
+            // Implement error clearing logic
+        }
+
+        function showError(elementId, message) {
+            // Implement error display logic
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function hasSpecialCharacters(str) {
+            // Implement special characters check
+            return /[^a-zA-Z0-9\s]/.test(str);
+        }
+
+        function isValidPincode(pincode) {
+            // Implement pincode validation
+            return /^\d{6}$/.test(pincode);
+        }
+        function enableDeliverButton(addressId) {
+            // Hide all buttons in other containers
+            document.querySelectorAll('.button-container').forEach(container => {
+                container.innerHTML = ''; // Clear all existing buttons
+            });
+
+            // Create and append buttons for the selected address
+            const buttonContainer = document.getElementById(`buttonContainer${addressId}`);
+            if (buttonContainer) {
+                // Create and append "Deliver Here" button
+                const deliverButton = document.createElement('button');
+                deliverButton.className = 'deliver-here-button';
+                deliverButton.id = `deliverHereButton${addressId}`;
+                deliverButton.innerText = 'Deliver Here';
+                deliverButton.style.marginLeft = 'auto';
+                deliverButton.onclick = function () {
+                    selectAddress(addressId);
+                    showChangeButton(addressId);
+                };
+                buttonContainer.appendChild(deliverButton);
+
+                // Create and append "Edit" button
+                const editButton = document.createElement('button');
+                editButton.className = 'edit-here-button';
+                editButton.id = `editButton${addressId}`;
+                editButton.innerText = 'Edit';
+                editButton.onclick = function () {
+                    editAddress(addressId);
+                };
+                buttonContainer.appendChild(editButton);
+
+                // Initially hide the change button
+                const changeButton = document.createElement('button');
+                changeButton.className = 'change-here-button';
+                changeButton.id = `changeButton${addressId}`;
+                changeButton.innerText = 'Change';
+                changeButton.style.display = 'none'; // Initially hidden
+                changeButton.onclick = function () {
+                    changeAddress(addressId);
+                };
+                buttonContainer.appendChild(changeButton);
+
+                // Hide other elements or forms
+                cancelAddAddress();
+            }
+        }
+        function showChangeButton(addressId) {
+            // Hide "Deliver Here" and "Edit" buttons for the selected address
+            document.getElementById(`deliverHereButton${addressId}`).style.display = 'none';
+            document.getElementById(`editButton${addressId}`).style.display = 'none';
+
+            // Show the "Change" button for the selected address
+            document.getElementById(`changeButton${addressId}`).style.display = 'inline-block';
+        }
+        function clearAddAddressForm() {
+            const formFields = document.querySelectorAll('.newAddess input');
+            formFields.forEach(field => {
+                field.value = '';
+            });
+        }
+        function cancelAddAddress() {
+            const form = document.getElementById('add-address-form');
+            form.style.display = 'none';
+        }
+        //payment
+        function placeOrder() {
+            try {
+                const radioButtons = document.querySelectorAll('input.checkAddr');
+                const anyChecked = Array.from(radioButtons).some(radio => radio.checked);
+                const form = document.getElementById('priceSummeryForm');
+                const addreddId = document.querySelector('input[name="address"]:checked');
+                const addressInput = document.createElement('input');
+                addressInput.type = 'hidden';
+                addressInput.name = 'addressId';
+                addressInput.value = addreddId.value;
+
+                form.appendChild(addressInput);
+
+                if (anyChecked) {
+                    form.submit();
+                } else {
+                    // Perform an alternative action if no radio button is checked
+                    console.log('No radio button is checked.');
+                }
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        //check radio address button
+        document.addEventListener('DOMContentLoaded', function () {
+            const radioButtons = document.querySelectorAll('input.checkAddr[type="radio"]');
+
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    if (this.checked) {
+                        const checkedRadioId = this.value;
+                        enableDeliverButton(checkedRadioId);
+                    }
+                });
+            });
+
+            // Check the initially checked radio button (if any) and call the function
+            const initialCheckedRadio = document.querySelector('input[name="address"]:checked');
+            if (initialCheckedRadio) {
+                enableDeliverButton(initialCheckedRadio.value);
+            }
+
+        });
+
+        function changeAddress(addressId) {
+            // Show all addresses and check the selected one
+            document.querySelectorAll('.address-item').forEach(item => {
+                item.style.display = 'block';
+            });
+            enableDeliverButton(addressId)
+        }
+    </script>
+</body>
+
+</html>

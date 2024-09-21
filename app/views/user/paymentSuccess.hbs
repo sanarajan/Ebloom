@@ -1,0 +1,81 @@
+<style>
+  /* Custom Styles */
+
+  .credits {
+    display: none
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+  }
+
+  .payment-success-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(120vh - 100px);
+    /* Adjusting for header and footer height */
+  }
+
+  .payment-success-card {
+    background-color: #fff;
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+  }
+
+  .success-icon {
+    width: 100px;
+    height: 100px;
+  }
+
+  h1 {
+    color: #4caf50;
+  }
+
+  p {
+    color: #555;
+    margin: 10px 0;
+  }
+
+  .btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+
+  .btn:hover {
+    background-color: #45a049;
+  }
+</style>
+</head>
+
+<body>
+  <!-- Navigation -->
+
+  <!-- Payment Success Content -->
+  <div class="payment-success-container">
+    <div class="payment-success-card">
+      <img src="/images/success.png" alt="Success" class="success-icon">
+      <h1> Successful!</h1>
+      <p>Your Order Confirmed..!</p>
+      <p>Order ID: <span id="orderId">{{ orderId}}</span></p>
+      <a href="/shop" class="btn">Back To Shop</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+
+  <script>  
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EBloom - Plant Nursery</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+
+  <style>
+    /* Custom Styles */
+    .navbar {
+      background-color: #6c757d; /* Match the banner background color */
+    }
+    .navbar-brand .green-e {
+      color: #28a745; /* Change this color to your preferred shade of green */
+    }
+    .navbar-nav .nav-link {
+      color: #212529; /* Darker text color for navigation links */
+    }
+    .navbar-nav .nav-link:hover {
+      color: #495057; /* Darker color on hover */
+    }
+    .banner-image {
+      background-image: url('../images/banner.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 400px; /* Default height for large screens */
+      width: 100%;
+      border-bottom: 5px solid #28a745; /* Optional: adds a green border at the bottom */
+      position: relative;
+      background-color: #6c757d; /* Match the banner background color */
+    }
+    @media (max-width: 768px) {
+      .banner-image {
+        height: 250px; /* Adjust height for smaller screens */
+      }
+    }
+    @media (max-width: 576px) {
+      .banner-image {
+        height: 200px; /* Further adjustment for very small screens */
+      }
+    }
+    .section-heading {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-align: center; /* Center the heading text */
+    }
+    .description {
+      text-align: center; /* Center the description text */
+      margin: 0 10px; /* Add left and right margins */
+    }
+    .our-collection,
+    .new-arrivals {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .collection-item,
+    .arrival-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 300px; /* Fixed height for each section */
+      width: 100%;
+      max-width: 250px;
+      border: 1px solid #ddd;
+      margin: 10px;
+      padding: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      position: relative; /* Position for the icons */
+    }
+    .card img {
+      max-height: 200px;
+      object-fit: cover;
+    }
+    .icon-top-left,
+    .icon-bottom-left {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.8); /* Semi-transparent background for visibility */
+      border-radius: 50%;
+      padding: 5px;
+    }
+    .icon-top-left {
+      top: 10px;
+      left: 10px;
+    }
+    .icon-bottom-left {
+      bottom: 10px;
+      left: 10px;
+    }
+    .icon-wishlist {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.8); /* Semi-transparent background for visibility */
+      border-radius: 50%;
+      padding: 5px;
+      left: 10px;
+    }
+    .icon-wishlist {
+      top: 50%; /* Center vertically with respect to the image */
+      transform: translateY(-50%); /* Adjust vertical alignment */
+    }
+    .footer {
+      background-color: #000000; /* Black background color */
+      color: #ffffff; /* White text color for better contrast */
+      padding: 1rem 0;
+    }
+    .footer .social-icons a {
+      margin-right: 10px;
+      color: #ffffff; /* White icon color */
+    }
+    .footer .social-icons {
+      margin-top: 10px;
+    }
+    .btn-icon {
+      margin: 5px;
+    }
+    .new-arrivals .card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .footer .section-heading {
+      font-size: 1.5rem;
+      text-align: center; /* Center footer section headings */
+      margin-bottom: 1rem;
+    }
+    .footer a {
+      color: #ffffff; /* White color for links */
+    }
+    .footer a:hover {
+      color: #cccccc; /* Light grey color on hover */
+    }
+    .footer .footer-content {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+    }
+    .footer .footer-content p {
+      text-align: center;
+    }
+    .credits{
+            display:none
+        }
+    .breadcrumb-item + .breadcrumb-item::before {
+      content: '>';
+    }
+    .product-img { max-width: 100%; height: auto; }
+    .product-details { margin-top: 20px; }
+    .product-rating i { color: gold; }
+    .related-products .card { margin-bottom: 20px; }
+    .error-message { color: red; font-weight: bold; }
+    .highlight { font-weight: bold; }
+
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+   {{> userHeader}}
+    {{#if showSidebar}}
+      {{> userSidebar}}
+    {{/if}}
+  
+
+  <!-- Banner -->
+  {{{body}}}
+
+  <!-- Footer -->
+ {{> userFooter}}

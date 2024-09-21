@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - EBloom</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .otp-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .otp-container h2 {
+            margin-bottom: 20px;
+            font-family: 'Arial', sans-serif;
+        }
+        .otp-container .btn-primary {
+            background-color: #4caf50; /* Green color for the button */
+            border-color: #4caf50;
+        }
+        .otp-container .btn-primary:hover {
+            background-color: #45a049;
+            border-color: #45a049;
+        }
+        #resendBtn {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="otp-container">
+        <h2 class="text-center">Verify Your OTP</h2>
+        {{#if errorMessage}}
+            <div class="alert alert-danger" role="alert">
+                {{errorMessage}}
+            </div>
+        {{/if}}
+        <form id="otpVerificationForm">
+            <input type="hidden" name="email" id="email" value="{{email}}">
+            <div id="succ" class="alert alert-success" style="display:none"></div>
+            <div class="form-group">
+                <label for="otp">Enter OTP:</label>
+                <input type="text" id="otp" name="otp" class="form-control" placeholder="Enter OTP" required>
+            </div>
+            <div id="otpError"></div>
+            <button type="submit" class="btn btn-primary btn-block">Verify OTP</button>
+            <button type="button" id="resendBtn" class="btn btn-secondary btn-block">Resend OTP</button>
+            <div id="countdown" class="text-center mt-2"></div>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const resendBtn = document.getElementById('resendBtn');
+        const countdownDiv = document.getElementById('countdown');
+        let countdownInterval;
+        const resendTime = 40; // Time in seconds
+
+        const startCountdown = (seconds) => {
+            let timeLeft = seconds;
+            countdownInterval = setInterval(() => {
+                const minutes = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                countdownDiv.textContent = `You can resend OTP in ${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+                timeLeft--;
+
+                if (timeLeft < 0) {
+                    clearInterval(countdownInterval);
+                    countdownDiv.textContent = '';
+                    resendBtn.style.display = 'block';
+                }
+            }, 1000);
+        };
+
+        const resendOtp = () => {
+            // Make an AJAX request to resend OTP
+            fetch('/sendOTPVerificationEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ otpEmail: document.getElementById('email').value }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        startCountdown(resendTime); // Restart countdown
+                        resendBtn.style.display = 'none';
+                    } else {
+                        console.error('Error resending OTP:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        };
+
+        document.getElementById('otpVerificationForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const email = document.getElementById('email').value;
+            const otp = document.getElementById('otp').value;
+            const otpError = document.getElementById('otpError');
+
+            fetch('/verifyOtp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, otp }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('succ').innerHTML = 'OTP verified successfully!';
+                        document.getElementById('succ').style.display = 'block';
+                        window.location.href = `/home`;
+                    } else {
+                        otpError.textContent = data.message || 'Error verifying OTP.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    otpError.textContent = 'An error occurred while verifying OTP.';
+                });
+        });
+
+        resendBtn.addEventListener('click', resendOtp);
+
+        // Start countdown on page load
+        startCountdown(resendTime);
+    </script>
+</body>
+</html>

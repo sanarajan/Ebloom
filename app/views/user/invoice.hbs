@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{invoiceNumber}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        hr {
+            border: 1px solid #ddd;
+            margin: 20px 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .invoice-left {
+            text-align: left;
+        }
+        .address {
+            text-align: right;
+        }
+        .invoice-details th, .invoice-details td {
+            padding: 8px;
+            text-align: left;
+        }
+        .invoice-details {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .invoice-details th {
+            background-color: #f4f4f4;
+        }
+        .charges, .total {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .charges th, .charges td, .total th, .total td {
+            padding: 8px;
+            text-align: right;
+        }
+        .charges th, .total th {
+            background-color: #f4f4f4;
+        }
+        .total-line {
+            border-top: 1px solid #ddd;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Line above header -->
+        <hr>
+        
+        <!-- Header Section (Invoice details on left, Address on right) -->
+        <div class="header">
+            <!-- Left side: Invoice details -->
+            <div class="invoice-left">
+                <h1>Invoice</h1>
+                <p>Invoice Number: {{invoiceNumber}}</p>
+                <p>Invoice Date: {{invoiceDate}}</p>
+            </div>
+            
+            <!-- Right side: User Address -->
+            <div class="address">
+                <h2>User Address</h2>
+                <p>{{userAddress}}</p>
+            </div>
+        </div>
+        
+        <!-- Line below header -->
+        <hr>
+        
+        <!-- Products Table -->
+        <table class="invoice-details">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Offer Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each products}}
+                <tr>
+                    <td>{{this.productName}}</td>
+                    <td>{{this.quantity}}</td>
+                    <td>{{this.totalPrice}}</td>
+                    <td>{{this.offerPrice}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        
+        <!-- Charges Section -->
+        <table class="charges">
+            <tr>
+                <th>Delivery Charge</th>
+                <td>{{deliveryCharge}}</td>
+            </tr>
+            <tr>
+                <th>Packing Charge</th>
+                <td>{{packingCharge}}</td>
+            </tr>
+            <!-- Line after packing charge -->
+            <tr>
+                <td colspan="2"><hr></td>
+            </tr>
+            <tr>
+                <th>Total Amount to be Paid</th>
+                <td>{{totalAmount}}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

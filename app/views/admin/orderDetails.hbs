@@ -1,0 +1,196 @@
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+<style>
+    .container-custom {
+        padding: 20px;
+        /*  margin-left: 250px;*/
+    }
+
+    .order-info {
+        margin-bottom: 20px;
+    }
+
+    .status-select {
+        width: 100%;
+    }
+
+    .sidebar {
+        width: 250px;
+    }
+
+    .table th {
+        text-align: left;
+    }
+</style>
+
+<div class="container-custom">
+    <h1>Order Details</h1>
+
+    <!-- Order Information -->
+    {{#each updatedOrders}}
+    <input type="hidden" id="userId" name="userId" value="{{this.userId._id}}">
+    <input type="hidden" id="orderId" name="orderId" value="{{this._id}}">
+    <div class="order-info">
+        <div class="row">
+            <div class="col md 4">
+                <p><strong>User Name:</strong> {{this.userId.username}}</p>
+                <p><strong>Address Ordered:</strong><br> {{this.address.house}},
+                    {{this.address.place}},{{this.address.city}}, <br>
+                    {{this.address.district}}, {{this.address.state}}, {{this.address.pincode}}</p>
+                {{#if (eq this.paymentMethod "Online" )}}
+                <p><strong>Razorpay OrderId:</strong> {{razorpayOrderId}}</p>
+
+                {{/if}}
+                <p><strong>Order ID:</strong> {{this.orderId}}</p>
+
+                <p><strong>Payment Method:</strong> {{paymentMethod}}</p>
+
+            </div>
+            <div class="col md 4">
+
+                <p><strong>Order Date:</strong> {{formatDate createdAt}}</p>
+
+                <p><strong>Total offer discount:</strong> {{this.offerTot}}</p>
+                <p><strong>Total coupon discount:</strong> {{this.discount}}</p>
+                <p><strong>Applied Coupon:</strong> {{this.couponDisc}}</p>
+
+                <p><strong>Total Discount:</strong> {{this.totalDiscount}}</p>
+
+            </div>
+            <div class="col md 4">
+                <p><strong>Total MRP:</strong> {{this.totalMRP}}</p>
+                <p><strong>Total Price:</strong> {{this.totalPrice}}</p>
+                <p><strong>Delivery Charge:</strong> {{this.deliveryCharge}}</p>
+                <p><strong>Packing Charge:</strong> {{this.packingCharge}}</p>
+
+                <p><strong>Total Sold Amout:</strong> {{this.totalAmount}}</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Order Items Table -->
+<table class="table datatable">
+    <thead>
+        <tr>
+            <th width="10%">Image</th>
+            <th width="10%">Product</th>
+            <th width="10%">Total MRP</th>
+            <th width="10%">Total Price</th>
+            <th width="10%">Quantity</th>
+            <th width="10%">Coupon</th>
+            <th width="10%">Offer</th>
+            <th width="10%">Offer Percentage</th>
+            <th width="10%">Discount</th>
+            {{!-- <th width="10%" class="text-end">Total</th> --}}
+            <th width="15%">Status</th>
+            <th width="15%">Change Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {{#each orderedProducts}}
+        <tr data-order-id="{{../this.orderId}}" data-user-id="{{../this.userId._id}}">
+            <td><img src="/{{this.image}}" style="width:50px;height:50px" alt="Product Image"></td>
+            <td>{{productName}}</td>
+            <td>{{this.itemTotalPrice}}</td>
+            <td id="totalAmt">{{this.offerPrice}}</td>
+
+
+            <td>{{this.quantity}}</td>
+            <td>{{this.discountProduct}}</td>
+            <td>{{this.discountOffer}}</td>
+            <td>{{this.offerPercentage}}%</td>
+            <td>{{this.totProdDisc}}</td>
+
+            {{!-- <td id="totalAmt" class="text-center">{{soldPrice}}</td> --}}
+            <td>
+                <button style="background-color: {{this.btnColr}};" class="btn btn-primary btn-sm update-status-btn">
+                    {{orderStatus}}
+                </button>
+            </td>
+            <td>
+                <select data-item-p="{{this.productId}}" class="form-control status-select" data-item-id="{{this._id}}">
+                    <option value="">--Select--</option>
+                    <option value="Shipped" {{#if (eq orderStatus "Shipped" )}}selected{{/if}}>Shipped</option>
+                    <option value="Delivered" {{#if (eq orderStatus "Delivered" )}}selected{{/if}}>Delivered
+                    </option>
+                    <option value="Cancelled" {{#if (eq orderStatus "Cancelled" )}}selected{{/if}}>Cancelled
+                    </option>
+                    <option value="Returned" {{#if (eq orderStatus "Returned" )}}selected{{/if}}>Returned
+                    </option>
+                </select>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+{{/each}}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.status-select').forEach(function (selectBox) {
+            selectBox.addEventListener('change', function () {
+                // var itemId =  document.getElementById('productId').value;
+                var status = this.value;
+                var itemId = this.getAttribute('data-item-p');
+                // Fetch the necessary hidden fields
+                var orderId = document.getElementById('orderId').value;
+                var userId = document.getElementById('userId').value;
+                var totalAmt = document.getElementById('totalAmt').textContent;
+               
+                fetch('/admin/updateOrderStatus', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: status,
+                        orderId: orderId,
+                        productId: itemId,
+                        userId: userId,
+                        totalAmt: totalAmt
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Order status updated successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        });
+                        // Find the associated button and update its text and color based on the new status
+                        var button = this.closest('tr').querySelector('.update-status-btn');
+                        button.textContent = status;
+
+                        switch (status) {
+                            case 'Shipped':
+                                button.style.backgroundColor = 'orange';
+                                break;
+                            case 'Delivered':
+                                button.style.backgroundColor = 'green';
+                                break;
+                            case 'Cancelled':
+                                button.style.backgroundColor = 'red';
+                                break;
+                            default:
+                                button.style.backgroundColor = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating order status:', error);
+                        alert('Failed to update order status. Please try again.');
+                    });
+            });
+        });
+    });
+
+    //sidebar
+
+</script>

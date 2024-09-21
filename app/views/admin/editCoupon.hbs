@@ -1,0 +1,464 @@
+<style>
+  #discountPercentageRow {
+    display: none;
+  }
+
+  #discountValueRow {
+    display: none;
+  }
+</style>
+
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>{{pageTitle}}</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item">Coupon</li>
+        <li class="breadcrumb-item active">{{pageTitle}}</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-10">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"></h5>
+            <!-- Horizontal Form -->
+            <form id="editCouponForm" action="/admin/updateCoupon" method="post" enctype="multipart/form-data">
+              <input type="hidden" name="_id" value="{{coupon._id}}">
+              <div class="row mb-3">
+                <label for="couponImage" class="col-sm-3 col-form-label">Coupon Image</label>
+                <div class="col-sm-9">
+                  <div class="row">
+                    <!-- File input takes up 50% of the width -->
+                    <div class="col-sm-6">
+                      <input type="file" name="couponImage" id="couponImage" class="form-control" accept="image/*">
+                    </div>
+                    <!-- Image preview takes up 50% of the width -->
+                    <div class="col-sm-6">
+                      <img src="{{#if coupon.couponImage}}/{{coupon.couponImage}}{{else}}/images/no-image.jpeg{{/if}}"
+                        alt="Coupon Image" class="img-fluid" id="couponImagePreview" style="height:70px;width:70px">
+
+                    </div>
+                  </div>
+                  <div id="couponImage_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="couponName" class="col-sm-3 col-form-label">Name</label>
+                <div class="col-sm-9">
+                  <input type="text" name="couponName" id="couponName" class="form-control"
+                    value="{{coupon.couponName}}">
+                  <div id="couponName_error" style="color: red;">{{#if error}}{{error}}{{/if}}</div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="startDate" class="col-sm-3 col-form-label">Start Date</label>
+                <div class="col-sm-9">
+                  <input type="date" name="startDate" id="startDate" class="form-control"
+                    value="{{dateCaldaerFormate coupon.startDate}}">
+                  <div id="startDate_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="endDate" class="col-sm-3 col-form-label">End Date</label>
+                <div class="col-sm-9">
+                  <input type="date" name="endDate" id="endDate" class="form-control"
+                    value="{{dateCaldaerFormate coupon.endDate}}">
+                  <div id="endDate_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="description" class="col-sm-3 col-form-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea name="description" id="description" class="form-control">{{coupon.description}}</textarea>
+                  <div id="description_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="minPurchase" class="col-sm-3 col-form-label">Minimum Purchase</label>
+                <div class="col-sm-9">
+                  <input type="number" name="minPurchase" id="minPurchase" class="form-control"
+                    value="{{coupon.minPurchase}}">
+                  <div id="minPurchase_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="discountType" class="col-sm-3 col-form-label">Discount Type</label>
+                <div class="col-sm-9">
+                  <select name="discountType" id="discountType" class="form-control">
+                    <option value="">--Select--</option>
+                    <option value="Percentage" {{#if (eq coupon.discountType "Percentage" )}}selected{{/if}}>Percentage
+                    </option>
+                    <option value="Amount" {{#if (eq coupon.discountType "Amount" )}}selected{{/if}}>Amount</option>
+                  </select>
+                  <div id="discountType_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3" id="discountPercentageRow" style="{{#if (eq coupon.discountType "
+                Percentage")}}display: flex;{{else}}display: none;{{/if}}">
+                <label for="discountPercentage" class="col-sm-3 col-form-label">Discount Percentage</label>
+                <div class="col-sm-9">
+                  <input type="number" name="discountPercentage" id="discountPercentage" class="form-control"
+                    value="{{coupon.discountPercentage}}">
+                  <div id="discountPercentage_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3" id="discountValueRow" style="{{#if (eq coupon.discountType " Amount")}}display:
+                flex;{{else}}display: none;{{/if}}">
+                <label for="discountValue" class="col-sm-3 col-form-label">Discount Value</label>
+                <div class="col-sm-9">
+                  <input type="number" name="discountValue" id="discountValue" class="form-control"
+                    value="{{coupon.discountValue}}">
+                  <div id="discountValue_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="userUsageLimit" class="col-sm-3 col-form-label">User Usage Limit</label>
+                <div class="col-sm-9">
+                  <input type="number" name="userUsageLimit" id="userUsageLimit" class="form-control"
+                    value="{{coupon.userUsageLimit}}">
+                  <div id="userUsageLimit_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="status" class="col-sm-3 col-form-label">Status</label>
+                <div class="col-sm-9">
+                  <select name="status" id="status" class="form-control">
+                    <option value="1" {{#if (eq coupon.status true)}}selected{{/if}}>Active</option>
+                    <option value="0" {{#if (eq coupon.status false)}}selected{{/if}}>Inactive</option>
+                  </select>
+                  <div id="status_error" style="color: red;"></div>
+                </div>
+              </div>
+
+             
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </form><!-- End Horizontal Form -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main><!-- End #main -->
+
+<script>
+  // JavaScript to handle dynamic changes
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Prevent negative numbers from being entered
+    const numberInputs = document.querySelectorAll('input[type="number"]');
+    numberInputs.forEach(function (input) {
+      input.addEventListener('input', function () {
+        if (this.value < 0) {
+          this.value = '';
+        }
+      });
+
+      input.addEventListener('keydown', function (e) {
+        if (e.key === '-' || e.key === 'e') {
+          e.preventDefault();
+        }
+      });
+    });
+
+    // Function to set error messages
+    function setError(elementId, message) {
+      const errorDiv = document.getElementById(`${elementId}_error`);
+      if (errorDiv) {
+        errorDiv.textContent = message;
+      }else {
+    console.error(`Error div with id ${elementId}_error not found.`);
+  }
+    }
+
+    // Function to clear error messages
+    function clearErrors() {
+      const errorDivs = document.querySelectorAll('[id$="_error"]');
+      errorDivs.forEach(div => div.textContent = '');
+    }
+
+    // Function to handle form submission
+    document.getElementById('editCouponForm').addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent form submission
+
+      // Clear previous error messages
+      clearErrors();
+
+      let isValid = true;
+
+      // Validate Name
+      const couponName = document.getElementById('couponName').value.trim();
+      if (!couponName) {
+        setError('couponName', 'Coupon name is required.');
+        isValid = false;
+      } else if (couponName.includes(' ')) {
+        setError('couponName', 'Coupon name should not contain spaces.');
+        isValid = false;
+      }
+
+      // Validate Description
+      const description = document.getElementById('description').value.trim();
+      if (!description) {
+        setError('description', 'Description is required.');
+        isValid = false;
+      }
+
+      // Validate Minimum Purchase
+      const minPurchase = document.getElementById('minPurchase').value.trim();
+      if (!minPurchase) {
+        setError('minPurchase', 'Minimum Purchase is required.');
+        isValid = false;
+      } else if (isNaN(minPurchase) || Number(minPurchase) <= 0) {
+        setError('minPurchase', 'Minimum Purchase must be a positive number greater than zero.');
+        isValid = false;
+      }
+
+      // Validate Discount Value
+      const discountValue = document.getElementById('discountValue').value.trim();
+      const discountPerctg = document.getElementById('discountPercentage').value.trim();
+      const discountType = document.getElementById('discountType').value;
+      if (discountType === 'Amount') {
+        if (!discountValue) {
+          setError('discountValue', 'Discount Value is required.');
+          isValid = false;
+        } else if (isNaN(discountValue) || Number(discountValue) < 0) {
+          setError('discountValue', 'Discount Value must be a positive number.');
+          isValid = false;
+        } else if (parseFloat(discountValue) >= parseFloat(minPurchase)) {
+          setError('discountValue', 'Discount Value cannot exceed Minimum Purchase.');
+          isValid = false;
+        }else {
+      // Clear error if valid
+      setError('discountValue', '');
+    }
+      } else {
+        if (!discountPerctg) {
+          setError('discountValue', 'Discount Value is required.');
+          isValid = false;
+        } else if (isNaN(discountPerctg) || Number(discountPerctg) < 0) {
+          setError('discountValue', 'Discount Value must be a positive number.');
+          isValid = false;
+        } else if (Number(discountPerctg) > Number(minPurchase)) {
+          setError('discountPercentage', 'Discount Percebtage  cannot exceed Minimum Purchase.');
+          isValid = false;
+        }
+      }
+      // Validate Discount Percentage
+      const discountPercentage = document.getElementById('discountPercentage').value.trim();
+      if (discountPercentage && (isNaN(discountPercentage) || Number(discountPercentage) < 0)) {
+        setError('discountPercentage', 'Discount Percentage must be a positive number.');
+        isValid = false;
+      }
+
+      // Validate User Usage Limit (Optional)
+      const userUsageLimit = document.getElementById('userUsageLimit').value.trim();
+      if (userUsageLimit && (isNaN(userUsageLimit) || Number(userUsageLimit) < 0)) {
+        setError('userUsageLimit', 'User Usage Limit must be a positive number if provided.');
+        isValid = false;
+      }
+
+      // Validate Status
+      const status = document.getElementById('status').value;
+      if (!status) {
+        setError('status', 'Status is required.');
+        isValid = false;
+      }
+
+      // Validate Category
+    
+      //image validation 
+      // Validate Image
+      const couponImageInput = document.getElementById('couponImage');
+      const imageSrc = document.getElementById('couponImagePreview').src;
+      const file = couponImageInput.files[0];
+      const maxFileSize = 2 * 1024 * 1024; // 2 MB
+      if ((!imageSrc || imageSrc === '/images/no-image.jpeg') && file) {
+        setError('couponImage', 'Coupon image is required.');
+        isValid = false;
+      } else if (file && !file.type.startsWith('image/')) {
+        setError('couponImage', 'Selected file is not a valid image.');
+        isValid = false;
+      } else if (file && file.size > maxFileSize) {
+        setError('couponImage', 'Image size should not exceed 2 MB.');
+        isValid = false;
+      }
+      let discountpect = validateDiscountValue();
+      if (discountpect === false) {
+        isValid = false
+      }
+
+      if (isValid) {
+        // Form is valid, submit the form
+        document.getElementById('editCouponForm').submit();
+      }
+    });
+
+    // Real-time validation
+    function setupRealTimeValidation() {
+      const fields = ['couponName', 'description', 'minPurchase','discountPercentage', 'discountValue', 'userUsageLimit', 'startDate', 'endDate'];
+      fields.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('input', function () {
+            const value = this.value.trim();
+            if (value && (id === 'couponName' ? !value.includes(' ') : true)) {
+              errorVanish(id);
+            }
+          });
+        }
+      });
+      // Special real-time validation for discount value and minimum purchase
+      const discountValueInput = document.getElementById('discountValue');
+      const minPurchaseInput = document.getElementById('minPurchase');
+      const discountPercentageInput = document.getElementById('discountPercentage');
+
+      if (discountValueInput && minPurchaseInput) {
+        
+        discountValueInput.addEventListener('input', function () {
+          validateDiscountValue();
+        });
+        minPurchaseInput.addEventListener('input', function () {
+          validateDiscountValue();
+        });
+      }
+      if (discountPercentageInput) {
+        discountPercentageInput.addEventListener('input', function () {
+          validateDiscountValue();
+        });
+      }
+    }
+
+    function errorVanish(elementId) {
+      const errorDiv = document.getElementById(`${elementId}_error`);
+      if (errorDiv) {
+        errorDiv.textContent = '';
+      }
+    }
+
+    function validateDiscountValue() {
+      let isValid = true;
+      const discountValue = document.getElementById('discountValue').value.trim();
+      const minPurchase = document.getElementById('minPurchase').value.trim();
+      const discountType = document.getElementById('discountType').value;
+      const discountPercentage = document.getElementById('discountPercentage').value;
+      if (discountType === 'amount' && discountValue && minPurchase && Number(discountValue) >= Number(minPurchase)) {
+        setError('discountValue', 'Discount Value cannot exceed Minimum Purchase.');
+        isValid = false;
+      } else if (discountType === "Percentage" && parseFloat(discountPercentage) > 25) {
+        setError('discountPercentage', 'Discount percentage  cannot exceed 25%.');
+        isValid = false;
+      } else {
+        errorVanish('discountValue');
+        isValid = true;
+      }
+      return isValid
+    }
+
+    // JavaScript to show/hide discountPercentage field based on discountType selection
+    function updateDiscountPercentageVisibility() {
+      const discountType = document.getElementById('discountType').value;
+      const discountPercentageRow = document.getElementById('discountPercentageRow');
+      const discountValueRow = document.getElementById('discountValueRow');
+      const discountPercentageInput = document.getElementById('discountPercentage');
+      if (discountType === 'Percentage') {
+        discountPercentageRow.style.display = 'flex';
+        discountValueRow.style.display = 'none';
+        discountValueRow.value = '';
+      } else if (discountType === 'Amount') {
+        discountPercentageRow.style.display = 'none';
+        discountValueRow.style.display = 'flex';
+
+        discountPercentageInput.value = ''; // Clear the value
+      }
+    }
+
+    // Add event listener to the discountType field
+    document.getElementById('discountType').addEventListener('change', updateDiscountPercentageVisibility);
+
+    // Initialize visibility based on the default selection
+    updateDiscountPercentageVisibility(); // This will set the initial state correctly
+
+    // Initialize real-time validation
+    setupRealTimeValidation();
+  });
+
+  //image preview
+  document.addEventListener('DOMContentLoaded', function () {
+    // Function to update image preview
+    function updateImagePreview(input) {
+      const preview = document.getElementById('couponImagePreview');
+      const file = input.files[0];
+
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        preview.src = '/images/no-image-placeholder.png';
+      }
+    }
+
+    // Event listener for the file input change event
+    const couponImageInput = document.getElementById('couponImage');
+    couponImageInput.addEventListener('change', function () {
+      updateImagePreview(this);
+    });
+
+    // Your existing form validation and other scripts...
+  });
+  //date selecting and matching
+  document.addEventListener('DOMContentLoaded', function () {
+    // Function to update the minimum date for end date
+    function updateEndDateMinDate() {
+      const startDateInput = document.getElementById('startDate');
+      const endDateInput = document.getElementById('endDate');
+      endDateInput.value = '';
+      // Get the selected start date
+      const startDateValue = startDateInput.value;
+
+      // Set the minimum date for end date to the selected start date
+      if (startDateValue) {
+        endDateInput.setAttribute('min', startDateValue);
+
+        // If end date is before the new start date, clear the end date
+        if (endDateInput.value && new Date(endDateInput.value) < new Date(startDateValue)) {
+          endDateInput.value = '';
+        }
+      } else {
+        // If start date is not selected, clear the minimum date for end date
+        endDateInput.removeAttribute('min');
+      }
+    }
+
+    // Add event listener to the startDate field
+    document.getElementById('startDate').addEventListener('change', updateEndDateMinDate);
+    // Initialize visibility and end date handling
+    // This will set the initial state correctly
+  });
+
+</script>

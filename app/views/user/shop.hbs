@@ -1,0 +1,608 @@
+<style>
+  .navbar .navbar-brand .green-e {
+    color: green;
+  }
+
+  .product-card {
+    margin-bottom: 30px;
+  }
+
+  .product-card img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .product-card .card-body {
+    text-align: center;
+  }
+
+  .product-card .old-price {
+
+    color: red;
+  }
+
+  .product-card .new-price {
+    color: green;
+  }
+
+  .product-card .icons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+  }
+
+  .product-card .icons a {
+    color: white;
+    margin-left: 5px;
+  }
+
+  .product-card .star-rating {
+    color: gold;
+  }
+
+  .product-card .add-to-cart {
+    margin-top: 10px;
+  }
+
+  .sidebar {
+    padding: 15px;
+    border-right: 1px solid #ddd;
+  }
+
+  .sidebar h5 {
+    margin-bottom: 15px;
+  }
+
+  .sidebar .filters {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .sidebar .filters li {
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  .sidebar .subcategories {
+    display: none;
+    margin-left: 15px;
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .sidebar .subcategories li {
+    margin-bottom: 5px;
+  }
+
+
+  .product-img-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .product-img {
+    max-width: 100%;
+    height: auto;
+    cursor: crosshair;
+  }
+
+  .zoomed-img {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    width: 300px;
+    height: 300px;
+    border: 1px solid #ddd;
+    background-repeat: no-repeat;
+    background-size: 200% 200%;
+    display: none;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .thumbnail-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+  }
+
+  .thumbnail-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    padding: 2px;
+  }
+
+  .product-card .image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .product-card .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+
+  .wishlist-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: #baa8a8;
+    /* Transparent red */
+    cursor: pointer;
+    transition: color 0.3s ease;
+    border-color: #0000;
+  }
+
+  .wishlist-icon.active {
+    color: red;
+    /* Full red when active */
+  }
+
+  .pagination-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+
+  .pagination-button:disabled {
+    background-color: #ccc;
+    cursor: default;
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+  #search {
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%; /* Full width of the container */
+}
+</style>
+
+
+<div class="container-fluid mt-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 sidebar">
+      <h5>Price</h5>
+      <div class="row mb-3">
+        <div class="col">
+          <input type="number" class="form-control" placeholder="Min" id="price-min">
+           <small id="min-error" class="text-danger"></small>
+
+        </div>
+        <div class="col">
+          <input type="number" class="form-control" placeholder="Max" id="price-max">
+           <small id="max-error" class="text-danger"></small>
+        </div>
+      </div>
+      <div class="filters">
+        <h5>Browse by Type</h5>
+        <ul class="categories">
+          {{#each categories}}
+          <li class="category">
+            <input type="checkbox" class="category-checkbox" id="category-{{this._id}}" value="{{this._id}}"
+              onclick="toggleSubcategories('{{this._id}}')">
+            <span onclick="toggleSubcategories('{{this._id}}')">{{this.categoryName}}</span>
+            <ul id="{{this._id}}" class="subcategories" style="display: none;">
+              {{#each this.subcategories}}
+              <li>
+                <input type="checkbox" class="subcategory-checkbox" id="{{this._id}}" value="{{this._id}}"
+                  onchange="updateParentCheckbox('{{../this._id}}')">
+                <label for="{{this._id}}">{{this.subCategoryName}}</label>
+              </li>
+              {{/each}}
+            </ul>
+          </li>
+          {{/each}}
+        </ul>
+
+        <!-- Other filters such as price range, new arrivals, etc. -->
+      </div>
+
+      <h5>Filters</h5>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="new-arrivals" onchange="applyFilters()">
+        <label class="form-check-label" for="new-arrivals">
+          New Arrivals
+        </label>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9">
+      <div class="d-flex justify-content-between mb-3">
+        <div>
+          <select class="form-control" id="sort-by" onchange="applyFilters()">
+            <option value="">Select...</option>
+            <option value="popularity">Popularity</option>
+            <option value="price-low-high">Price: Low to High</option>
+            <option value="price-high-low">Price: High to Low</option>
+            <option value="average-ratings">Average Ratings</option>
+            <option value="featured">Featured</option>
+            <option value="new-arrivals">New Arrivals</option>
+            <option value="a-to-z">A - Z</option>
+            <option value="z-to-a">Z - A</option>
+          </select>
+        </div>
+        <div>
+          <input type="search" id="search" class="form-control" onkeyup="fetchProductsAndPagination(1)" placeholder="Search products">
+        </div>
+      </div>
+      <div class="row" id="product-list">
+        <!-- Product Card -->
+        <!-- Repeat Product Card as needed -->
+      </div>
+      {{!-- pagination --}}
+      <div class="content-container text-end" style="width:95%">
+        <div class="pagination-container mt-3 mb-3" id="pagination-container">
+          <!-- Pagination buttons will be dynamically added here -->
+        </div>
+        <div id="data-container"></div>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+
+<script>
+  const paginationContainer = document.getElementById('pagination-container');
+  const dataContainer = document.getElementById('data-container');
+  let currentPage = 1;
+  let totalPages = 1;
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    fetchProductsAndPagination(currentPage);
+
+    //check min and max valid
+    document.getElementById('price-min').addEventListener('input', validatePrice);
+    document.getElementById('price-max').addEventListener('input', validatePrice);
+   // document.getElementById('price-max').addEventListener('focusout', checkPriceRange);
+
+    // Apply filters
+    document.getElementById('sort-by').addEventListener('change', applyFilters);
+  //  document.getElementById('price-min').addEventListener('input', applyFilters);
+   // document.getElementById('price-max').addEventListener('input', applyFilters);
+    document.getElementById('new-arrivals').addEventListener('change', applyFilters);
+
+    document.querySelectorAll('.subcategory-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', applyFilters);
+    });
+
+    document.querySelectorAll('.category-checkbox').forEach(categoryCheckbox => {
+      categoryCheckbox.addEventListener('change', function () {
+        const subcategories = document.querySelectorAll(`#${this.id} + ul .subcategory-checkbox`);
+        subcategories.forEach(subcategory => {
+          subcategory.checked = this.checked; // Check/uncheck subcategories based on category
+        });
+        applyFilters(); // Apply filters after checking/unchecking
+      });
+    });
+
+    // Update parent category on subcategory unselect
+    document.querySelectorAll('.subcategory-checkbox').forEach(subcategoryCheckbox => {
+      subcategoryCheckbox.addEventListener('change', function (event) {
+        event.stopPropagation(); // Prevent the click from bubbling up
+        const categoryCheckbox = this.closest('.category').querySelector('.category-checkbox');
+
+        if (this.checked) {
+          // Check the parent category when a subcategory is checked
+          categoryCheckbox.checked = true;
+        } else {
+          // Uncheck the subcategory
+          this.checked = false; // explicitly uncheck the clicked subcategory
+
+          // Check if this subcategory is unchecked; if yes, then uncheck the parent category
+          const subcategories = this.closest('.category').querySelectorAll('.subcategory-checkbox');
+          const anyOtherChecked = Array.from(subcategories).some(checkbox => checkbox.checked && checkbox !== this);
+
+          if (!anyOtherChecked) {
+            categoryCheckbox.checked = false; // Uncheck parent if no subcategories are checked
+          }
+        }
+
+        applyFilters();
+      });
+    });
+
+  });
+
+
+  const fetchProductsAndPagination = async (page = 1) => {
+    const limit = 4;
+    const sortBy = document.getElementById('sort-by').value || null;
+    const minPrice = document.getElementById('price-min').value || null;
+    const maxPrice = document.getElementById('price-max').value || null;
+    const newArrivals = document.getElementById('new-arrivals').checked ? 'true' : 'false';
+    const searchTerm =  document.getElementById('search').value;
+    console.log(searchTerm+" search")
+    // Get selected categories and subcategories
+    const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.value);
+    const selectedSubcategories = Array.from(document.querySelectorAll('.subcategory-checkbox:checked')).map(cb => cb.value);
+    // Construct query parameters
+    const queryParams = new URLSearchParams({
+      searchTerm,
+      sortBy,
+      minPrice,
+      maxPrice,
+      newArrivals,
+      category: selectedCategories.join(','),
+      subcategory: selectedSubcategories.join(','),
+      page
+    });
+
+    try {
+      const response = await fetch(`/shopFetch?${queryParams.toString()}`);
+      const data = await response.json();
+      console.log(data)
+      renderProducts(data.products);
+      renderPagination(data.currentPage, data.totalPages);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const applyFilters = () => {
+    fetchProductsAndPagination(1); // Reset to first page on filter change
+  };
+
+  const renderProducts = (products) => {
+    const productListElement = document.getElementById('product-list');
+    productListElement.innerHTML = '';
+
+    products.forEach(product => {
+      const productCard = document.createElement('div');
+      productCard.className = 'col-md-3 product-card';
+      productCard.innerHTML = `
+          <div class="card" style="cursor:pointer">
+            <div class="image-container d-flex justify-content-center align-items-center">
+              <img src="${product.thumbnailPaths[0]}" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">${product.productName}</h5>
+              ${product.status ? `<p id="status">${product.status}</p>` : ''}
+              <p class="old-price" style="${product.isOfferExist ? 'text-decoration: line-through' : ''}">₹${product.price}</p>
+              <p class="new-price">
+        ${product.isOfferExist ? '₹' + product.offerPrice : '<p></p>'} <!-- If offerPrice exists, show it; otherwise, show regular price -->
+      </p>
+              <div class="star-rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+            </div>
+            <div class="icons">
+              <i id="wishlist-icon${product._id}" class="wishlist-icon fas fa-heart ${product.inWishlist ? 'active' : ''}" onclick="toggleWishlist('${product._id}', event)"></i>
+            </div>
+          </div>
+        `;
+      productCard.addEventListener('click', (event) => {
+        // Check if the clicked element is not the wishlist icon
+        if (!event.target.closest('.wishlist-icon')) {
+          window.location.href = `/productDetails/${product._id}`;
+        }
+      });
+      productListElement.appendChild(productCard);
+    });
+  };
+
+  const renderPagination = (currentPage, totalPages) => {
+    paginationContainer.innerHTML = '';
+    for (let page = 1; page <= totalPages; page++) {
+      const button = document.createElement('button');
+      button.innerText = page;
+      button.className = 'pagination-button';
+      button.disabled = page === currentPage;
+      button.addEventListener('click', () => {
+        fetchProductsAndPagination(page);
+      });
+      paginationContainer.appendChild(button);
+    }
+  };
+
+  // Function to toggle visibility of subcategories
+  function toggleSubcategories(categoryId) {
+    const subcategories = document.getElementById(categoryId);
+    const categoryCheckbox = document.getElementById('category-' + categoryId);
+
+    if (subcategories) {
+      // Toggle the visibility of subcategories
+      const isCurrentlyVisible = subcategories.style.display === 'block';
+      subcategories.style.display = isCurrentlyVisible ? 'none' : 'block';
+
+      // Check or uncheck all subcategory checkboxes based on the category checkbox state
+      const subcategoryCheckboxes = subcategories.querySelectorAll('.subcategory-checkbox');
+      subcategoryCheckboxes.forEach(checkbox => {
+        checkbox.checked = categoryCheckbox.checked; // Check if the category checkbox is checked
+      });
+    }
+  }
+
+  function updateParentCheckbox(categoryId) {
+    alert(categoryId + " category")
+    const subcategories = document.getElementById(categoryId);
+    const parentCheckbox = document.getElementById('category-' + categoryId);
+    if (subcategories) {
+      const subcategoryCheckboxes = subcategories.querySelectorAll('.subcategory-checkbox');
+
+      // Check if any subcategory is unchecked
+      const anyUnchecked = Array.from(subcategoryCheckboxes).some(checkbox => !checkbox.checked);
+
+      // If any subcategory is unchecked, uncheck the parent category
+      parentCheckbox.checked = !anyUnchecked;
+    }
+  }
+
+
+
+
+//keyup min and max
+function validatePrice(event) {
+  event.target.value = event.target.value.replace(/[^0-9]/g, '');
+  const minPriceInput = document.getElementById('price-min');
+  const maxPriceInput = document.getElementById('price-max');
+  const minError = document.getElementById('min-error');
+  const maxError = document.getElementById('max-error');
+
+  minError.textContent = '';
+  maxError.textContent = '';
+
+  const minPrice = parseFloat(minPriceInput.value);
+  const maxPrice = parseFloat(maxPriceInput.value);
+
+  if (minPrice < 0) {
+    minError.textContent = 'Min price cannot be negative.';
+    minPriceInput.value = '';  // Optionally, clear the invalid value
+  }
+  
+  if (maxPrice < 0) {
+    maxError.textContent = 'Max price cannot be negative.';
+    maxPriceInput.value = '';  // Optionally, clear the invalid value
+  }
+
+  if (!isNaN(minPrice) && !isNaN(maxPrice) && maxPrice < minPrice) {
+   maxError.textContent = 'Enter valid price.';
+  }else{
+  applyFilters()
+  }
+}
+
+//focusout max price
+function checkPriceRange(){
+  const minPriceInput = document.getElementById('price-min');
+  const maxPriceInput = document.getElementById('price-max');
+  const minError = document.getElementById('min-error');
+  const maxError = document.getElementById('max-error');
+
+  // Clear previous errors
+  minError.textContent = '';
+  maxError.textContent = '';
+
+  const minPrice = parseFloat(minPriceInput.value);
+  const maxPrice = parseFloat(maxPriceInput.value);
+   if (!isNaN(minPrice) && !isNaN(maxPrice) && maxPrice < minPrice) {
+    maxError.textContent = 'Enter valid price range.';
+  }else{
+  applyFilters()
+  }
+
+}
+
+
+
+
+
+
+  function updateProductList(products) {
+    const productList = document.getElementById('product-list');
+    productList.innerHTML = ''; // Clear existing products
+    products.forEach(product => {
+      const productCard = `
+      <div class="col-md-3 mb-4">
+        <a href="/productDetails/${product._id}" class="text-decoration-none" style="cursor:pointer">
+          <div class="card product-card">
+            <div class="image-container d-flex justify-content-center align-items-center">
+              <img src="${product.thumbnailPaths[0]}" alt="Product Image" class="img-fluid">
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">${product.productName}</h5>
+              ${product.status ? `<p id="status">${product.status}</p>` : ''}
+              <p class="old-price">₹400 </p>
+              <p class="new-price">₹${product.price} </p>
+              <div class="star-rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </div>
+            </div>
+           
+          </div>
+        </a>
+         <div class="icons">
+                  <i id="wishlist-icon${product._id}"  style='margin-right:10px' class="fas fa-heart wishlist-icon  ${product.inWishlist ? `active` : ''}"
+          onclick="toggleWishlist('${product._id}')"></i>
+            </div>
+      </div>
+    `;
+      productList.insertAdjacentHTML('beforeend', productCard);
+    });
+  }
+
+
+  function generateStarRating(rating) {
+    // Example function to generate star rating based on the average rating
+    const fullStars = Math.floor(rating);
+    const halfStars = rating % 1 > 0.5 ? 1 : 0;
+    const emptyStars = 5 - fullStars - halfStars;
+    return `
+    ${'<i class="fas fa-star"></i>'.repeat(fullStars)}
+    ${'<i class="fas fa-star-half-alt"></i>'.repeat(halfStars)}
+    ${'<i class="far fa-star"></i>'.repeat(emptyStars)}
+  `;
+  }
+  // Fetch initial product list without sorting
+
+
+  //wishlist
+  async function toggleWishlist(productId, event) {
+    event.stopPropagation();
+    const wishlistIcon = document.getElementById('wishlist-icon' + productId);
+    const isActive = wishlistIcon.classList.contains('active');
+
+    try {
+      const response = await fetch(`/addToWishlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId })
+      });
+
+      const data = await response.json();
+
+      if (response.status === 200) {
+        if (isActive) {
+          wishlistIcon.classList.remove('active');
+          wishlistIcon.style.color = '#baa8a8'; // Make icon transparent
+        } else {
+          wishlistIcon.classList.add('active');
+          wishlistIcon.style.color = 'red'; // Make icon fully red
+        }
+      } else {
+        console.error('Error:', data.message);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+</script>
+</body>
+
+</html>

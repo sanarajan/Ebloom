@@ -1,0 +1,436 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Edit Product</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/addProduct">Add Product</a></li>
+        <li class="breadcrumb-item active">Edit Product</li>
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-10">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"></h5>
+
+            {{#if errorMessage}}
+            <div class="alert alert-danger"> {{errorMessage}}</div>
+            {{/if}}
+
+            {{#if errors}}
+            <div class="alert alert-danger"> {{errors}}</div>
+            {{/if}}
+
+
+
+            <!-- Horizontal Form -->
+            <form id="productForm" enctype="multipart/form-data">
+              <input type="hidden" name="_id" id="_id" class="form-control" value="{{product._id}}">
+
+              <div class="row mb-3">
+                <label for="productName" class="col-sm-3 col-form-label">Product Name</label>
+                <div class="col-sm-9">
+                  <input type="text" name="productName" id="productName" class="form-control"
+                    value="{{product.productName}}">
+                  <div id="productName_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="categoryId" class="col-sm-3 col-form-label">Category</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="categoryId" id="categoryId">
+                    <option value="">--Select--</option>
+                    {{#each categories}}
+                    {{../product.subCategoryId.categoryId._id}}= {{this._id}}
+
+                    <option value="{{this._id}}" {{ternary (eq ../product.subCategoryId.categoryId._id
+                      this._id) "selected" "" }}>{{this.categoryName}}</option>
+                    {{/each}}
+                  </select>
+                  <div id="categoryId_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="subCategoryId" class="col-sm-3 col-form-label">Sub Category</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="subCategoryId" id="subCategoryId">
+                    <option value="">--Select--</option>
+                    {{#each subcategories}}
+                    <option value="{{this._id}}" {{ternary (eq ../product.subCategoryId._id this._id) "selected" "" }}>
+                      {{this.subCategoryName}}</option>
+                    {{/each}}
+                  </select>
+                  <div id="subCategoryId_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="specification1" class="col-sm-3 col-form-label">Specification1</label>
+                <div class="col-sm-9">
+                  <input type="text" name="specification1" id="specification1" class="form-control"
+                    value="{{product.specifications.specification1}}">
+                  <div id="specification1_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="specification2" class="col-sm-3 col-form-label">Specification2</label>
+                <div class="col-sm-9">
+                  <input type="text" name="specification2" id="specification2" class="form-control"
+                    value="{{product.specifications.specification2}}">
+                  <div id="specification2_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="specification3" class="col-sm-3 col-form-label">Specification3</label>
+                <div class="col-sm-9">
+                  <input type="text" name="specification3" id="specification3" class="form-control"
+                    value="{{product.specifications.specification3}}">
+                  <div id="specification3_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="specification4" class="col-sm-3 col-form-label">Specification4</label>
+                <div class="col-sm-9">
+                  <input type="text" name="specification4" id="specification4" class="form-control"
+                    value="{{product.specifications.specification4}}">
+                  <div id="specification4_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="description" class="col-sm-3 col-form-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea class="form-control" name="description" id="description">{{product.description}}</textarea>
+                  <div id="description_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="price" class="col-sm-3 col-form-label">Price</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="price" id="price" value="{{product.price}}">
+                  <div id="price_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="quantity" class="col-sm-3 col-form-label">Quantity</label>
+                <div class="col-sm-9">
+                  <input type="text" class="form-control" name="quantity" id="quantity" value="{{product.quantity}}">
+                  <div id="quantity_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <!-- Image Uploads -->
+              {{#each product.images}}
+              <div class="row mb-3">
+                <label for="image{{add @index 1}}" class="col-sm-3 col-form-label">Image {{add @index 1}}</label>
+                <div class="col-sm-4 d-flex align-items-center">
+                  <input type="file" name="images" id="image{{add @index 1}}" class="form-control me-2"
+                    accept="image/*">
+                </div>
+                <div class="col-sm-5 d-flex align-items-center justify-content-start">
+                  {{#if this}}
+                  <img id="image{{add @index 1}}_preview" src="/{{this}}"
+                    style="max-width: 50px; max-height: 50px; border: 1px solid #ddd;">
+                  {{else}}
+                  <span>No image</span>
+                  {{/if}}
+                </div>
+                <div class="col-sm-12 text-center mt-2">
+                  <span id="image{{add @index 1}}_error" style="color: red;margin-right:10rem"></span>
+                </div>
+              </div>
+              {{/each}}
+
+              <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2 text-center">
+                  <button type="submit" class="btn btn-primary">Update Product</button>
+                </div>
+              </div>
+            </form><!-- End Horizontal Form -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main><!-- End #main -->
+<!-- End #main -->
+<!-- End #main -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function validateDecimalInput(value) {
+      // Regex for validating decimal numbers with up to 2 decimal places
+      const decimalRegex = /^\d*(\.\d{0,2})?$/;
+      return decimalRegex.test(value);
+    }
+
+    function formatDecimalInput(value) {
+      // Format the value to 2 decimal places
+      return parseFloat(value).toFixed(2);
+    }
+
+    function productValidation(event) {
+      const productName = document.getElementById('productName').value.trim();
+      const categoryId = document.getElementById('categoryId').value;
+      const subCategoryId = document.getElementById('subCategoryId').value;
+      const description = document.getElementById('description').value.trim();
+
+      const price = document.getElementById('price').value.trim();
+      const quantity = document.getElementById('quantity').value.trim();
+      const image1 = document.getElementById('image1').files[0];
+      const image2 = document.getElementById('image2').files[0];
+
+      const image3 = document.getElementById('image3').files[0];
+      const image4 = document.getElementById('image4').files[0];
+      const productName_error = document.getElementById('productName_error');
+      const categoryId_error = document.getElementById('categoryId_error');
+      const subCategoryId_error = document.getElementById('subCategoryId_error');
+      const price_error = document.getElementById('price_error');
+      const quantity_error = document.getElementById('quantity_error');
+      const description_error = document.getElementById('description_error');
+      const image1_error = document.getElementById('image1_error');
+      const image2_error = document.getElementById('image2_error');
+      const image3_error = document.getElementById('image3_error');
+      const image4_error = document.getElementById('image4_error');
+
+
+      let valid = true;
+
+      // Clear previous error messages
+      subCategoryId_error.textContent = "";
+      categoryId_error.textContent = "";
+      description_error.textContent = "";
+      price_error.textContent = "";
+      quantity_error.textContent = "";
+      productName_error.textContent = "";
+      image1_error.textContent = "";
+      image2_error.textContent = "";
+      image3_error.textContent = "";
+      image4_error.textContent = "";
+
+
+      if (!productName) {
+        productName_error.textContent = "Field Required";
+        valid = false;
+      }
+      if (!subCategoryId) {
+        subCategoryId_error.textContent = "Field Required";
+        valid = false;
+      }
+
+      if (!categoryId) {
+        categoryId_error.textContent = "Field Required";
+        valid = false;
+      }
+
+      if (!description) {
+        description_error.textContent = "Field  Required";
+        valid = false;
+      }
+      if (!price) {
+        price_error.textContent = "Field  Required";
+        valid = false;
+      } else if (!validateDecimalInput(price)) {
+        price_error.textContent = "Price must be a decimal number with up to 2 decimal places";
+        valid = false;
+      }
+      if (!quantity) {
+        quantity_error.textContent = "Field  Required";
+        valid = false;
+      } else if (!validateDecimalInput(quantity)) {
+        quantity_error.textContent = "Quantity must be a decimal number with up to 2 decimal places";
+        valid = false;
+      }
+
+
+      validateImageInput(document.getElementById('image1'), image1_error);
+      validateImageInput(document.getElementById('image2'), image2_error);
+      validateImageInput(document.getElementById('image3'), image3_error);
+      validateImageInput(document.getElementById('image4'), image4_error);
+
+      if (!valid) {
+        event.preventDefault();
+      } else {
+
+        submitProductForm()
+      }
+    }
+
+    document.getElementById('productForm').addEventListener('submit', productValidation);
+  });
+
+  function validateImageInput(imageInput, errorElement) {
+    const imagePreview = document.getElementById(imageInput.id + '_preview');
+    if (!imageInput.files.length && !imagePreview.src) {
+      errorElement.textContent = "Field Required";
+      valid = false;
+    } else if (imageInput.files.length && !imageInput.files[0].type.startsWith('image/')) {
+      errorElement.textContent = "File must be an image";
+      valid = false;
+    }
+  }
+
+  function previewImage(input, previewId) {
+    const file = input.files[0];
+    const preview = document.getElementById(previewId);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  document.getElementById('image1').addEventListener('change', function () {
+    previewImage(this, 'image1_preview');
+  });
+  document.getElementById('image2').addEventListener('change', function () {
+    previewImage(this, 'image2_preview');
+  });
+  document.getElementById('image3').addEventListener('change', function () {
+    previewImage(this, 'image3_preview');
+  });
+  document.getElementById('image4').addEventListener('change', function () {
+    previewImage(this, 'image4_preview');
+  });
+
+
+  function clearErrorOnInput(event) {
+    const target = event.target;
+    const errorElement = document.getElementById(`${target.id}_error`);
+    if (errorElement) {
+      // Only clear error if input is valid or corrected
+      if (target.type === 'file' && target.files.length > 0) {
+        const file = target.files[0];
+        if (file.type.startsWith('image/')) {
+          errorElement.textContent = '';
+        } else {
+          errorElement.textContent = 'File must be an image';
+        }
+      } else if (target.id === 'price' || target.id === 'quantity') {
+        // Validate and format price and quantity inputs
+        if (validateDecimalInput(target.value)) {
+          target.value = formatDecimalInput(target.value);
+          errorElement.textContent = '';
+        } else {
+          errorElement.textContent = `Invalid ${target.id === 'price' ? 'price' : 'quantity'}. Must be a decimal with up to 2 decimal places.`;
+        }
+      } else if (target.value) {
+        errorElement.textContent = '';
+      }
+    }
+  }
+
+  // Add event listeners for real-time error handling
+  const inputs = document.querySelectorAll('input, textarea, select');
+  inputs.forEach((input) => {
+    let eventType = '';
+    if (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA') {
+      eventType = 'keyup';
+    }
+    if (input.tagName === 'SELECT' || input.type === 'file') {
+      eventType = 'change';
+    }
+    input.addEventListener(eventType, clearErrorOnInput);
+  });
+
+  // Attach form validation on submit
+
+
+  // category subcategory selection
+  document.addEventListener('DOMContentLoaded', function () {
+    const categorySelect = document.getElementById('categoryId');
+    const subCategorySelect = document.getElementById('subCategoryId');
+
+    categorySelect.addEventListener('change', function () {
+      const selectedCategory = categorySelect.value;
+
+      // Clear the subcategory dropdown
+      subCategorySelect.innerHTML = '<option value="">--Select--</option>';
+
+      if (selectedCategory) {
+        fetch(`/admin/selectSubcategories?categoryId=${selectedCategory}`, { // Use selectedCategory here
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            // Populate the subcategory dropdown with the fetched data
+            if (data.subcategories && data.subcategories.length > 0) {
+              data.subcategories.forEach(subcategory => {
+                const option = document.createElement('option');
+                option.value = subcategory._id; // Assuming subcategory has _id property
+
+                option.textContent = subcategory.subCategoryName; // Assuming subcategory has name property
+                subCategorySelect.appendChild(option);
+              });
+            } else {
+              const option = document.createElement('option');
+              option.value = "";
+              option.textContent = "No subcategories available";
+              subCategorySelect.appendChild(option);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching subcategories:', error);
+          });
+      }
+    });
+  });
+
+  //submit update form
+  function submitProductForm() {
+    // Create a FormData object from the form element
+    var formElement = document.getElementById('productForm');
+    var formData = new FormData(formElement);
+
+    // Append preview images to the FormData
+    document.querySelectorAll('img[id$="_preview"]').forEach((img, index) => {
+      if (img.src && img.src.startsWith('data:image/')) {
+        fetch(img.src)
+          .then(res => res.blob())
+          .then(blob => {
+            const file = new File([blob], `preview${index}.jpg`, { type: 'image/jpeg' });
+            formData.append('previewImages', file);
+          })
+          .catch(error => console.error('Error fetching image blob:', error));
+      }
+    });
+
+    // Submit the form data
+    fetch('/admin/updateProduct', {
+      method: 'PATCH',
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = '/admin/products'; // Redirect on success
+        } else {
+          // Handle errors
+          console.error('Form submission error:', data.error);
+          alert('There was an error submitting the form. Please try again.');
+        }
+      })
+      .catch(error => console.error('Form submission error:', error));
+  }
+
+
+
+
+</script>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Offer - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/templ/css/style.css" rel="stylesheet">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const offerType = document.getElementById('offerType');
+            const percentageField = document.getElementById('percentageField');
+            const amountField = document.getElementById('amountField');
+
+            // Function to toggle between discount fields
+            offerType.addEventListener('change', function () {
+                if (this.value === 'percentage') {
+                    percentageField.style.display = 'flex';
+                    amountField.style.display = 'none';
+                } else if (this.value === 'amount') {
+                    percentageField.style.display = 'none';
+                    amountField.style.display = 'flex';
+                } else {
+                    percentageField.style.display = 'none';
+                    amountField.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <!-- ======= Header ======= -->
+    <!-- ======= Main Content ======= -->
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Add Offer</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="/admin/offers">Offers</a></li>
+                    <li class="breadcrumb-item active">Add Offer</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-10">
+
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Create a New Offer</h5>
+                             <div id="erroMessage" class="alert ">{{errorMessage}}</div>
+                            <!-- Offer Form -->
+                            <form action="/admin/addOffer" method="POST" id="offerForm">
+
+                                <div class="row mb-3">
+                                    <label for="offerName" class="col-sm-3 col-form-label">Offer Name</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="offerName" name="offerName"
+                                            required>
+                                        <span id="offerName_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="startDate" class="col-sm-3 col-form-label">Start Date</label>
+                                    <div class="col-sm-9">
+                                        <input type="date" class="form-control" id="startDate" name="startDate"
+                                            required>
+                                        <span id="startDate_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="endDate" class="col-sm-3 col-form-label">End Date</label>
+                                    <div class="col-sm-9">
+                                        <input type="date" class="form-control" id="endDate" name="endDate" required>
+                                        <span id="endDate_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="offerFor" class="col-sm-3 col-form-label">Offer For</label>
+                                    <div class="col-sm-9">
+                                        <select id="offerFor" name="offerFor" class="form-select" required>
+                                            <option value="">Select</option>
+                                            <option value="product">Product</option>
+                                            <option value="category">Category</option>
+                                        </select>
+                                        <span id="offerFor_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Product Field -->
+                                <div class="row mb-3" id="productField" style="display: none;">
+                                    <label for="product" class="col-sm-3 col-form-label">Product</label>
+                                    <div class="col-sm-9">
+                                        <select id="product" name="product" class="form-select">
+                                            <option value="">Select Product</option>
+                                            {{#each products}}
+                                            <option data-price="{{this.price}}" value="{{this._id}}">{{this.productName}}-₹{{this.price}}</option>
+                                            {{/each}}
+
+                                            <!-- Populate products dynamically -->
+                                        </select>
+                                        <span id="product_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Category Field -->
+                                <div class="row mb-3" id="categoryField" style="display: none;">
+                                    <label for="category" class="col-sm-3 col-form-label">Category</label>
+                                    <div class="col-sm-9">
+                                        <select id="category" name="category" class="form-select">
+                                            <option value="">Select Category</option>
+                                            {{#each categories}}
+                                            <option value="{{this._id}}">{{this.categoryName}}</option>
+                                            {{/each}}
+                                        </select>
+                                        <span id="category_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="offerPercentage" class="col-sm-3 col-form-label">Offer
+                                        Percentage</label>
+                                    <div class="col-sm-9">
+                                        <input type="number" class="form-control" id="offerPercentage"
+                                            name="offerPercentage" step="0.01" required>
+                                        <span id="offerPercentage_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Discounted Price Field -->
+                                <div class="row mb-3" id="discountedPriceField" style="display: none;">
+                                    <label for="discountedPrice" class="col-sm-3 col-form-label">Discounted
+                                        Price</label>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" id="discountedPrice"
+                                            name="discountedPrice" readonly>
+                                        <span id="discountedPrice_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="description" class="col-sm-3 col-form-label">Description</label>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control" id="description" name="description" rows="4"
+                                            required></textarea>
+                                        <span id="description_err" style="color:red;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-sm-12">
+                                        <button type="submit" class="btn btn-primary">Save Offer</button>
+                                    </div>
+                                </div>
+
+                            </form><!-- End Offer Form -->
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main><!-- End #main -->
+
+    <!-- ======= Footer ======= -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+<script>
+
+    function setError(elementId, message) {
+    document.getElementById(elementId + '_err').textContent = message;
+}
+
+// Function to clear error messages
+function clearError(elementId) {
+    document.getElementById(elementId + '_err').textContent = '';
+}
+
+// Real-time validation for Offer Percentage field
+document.getElementById('offerPercentage').addEventListener('input', function() {
+    validateOfferPercentage();
+});
+
+function validateOfferPercentage() {
+    let offerPercentage = document.getElementById('offerPercentage').value;
+    let isValid = true;
+    
+    // Clear any previous errors
+    clearError('offerPercentage');
+
+    if (isNaN(offerPercentage) || Number(offerPercentage) < 0) {
+        setError('offerPercentage', 'Discount Value must be a positive number.');
+        isValid = false;
+    } else if (Number(offerPercentage) > 25) {
+        setError('offerPercentage', 'Offer Percentage cannot exceed 25.');
+        isValid = false;
+    }
+
+    return isValid;
+}
+    document.addEventListener("DOMContentLoaded", function () {
+  const today = new Date().toISOString().split('T')[0];
+    const startDatePicker = document.getElementById('startDate');
+    startDatePicker.setAttribute('min', today);
+
+        const offerFor = document.getElementById('offerFor');
+        const percentageField = document.getElementById('percentageField');
+        const productField = document.getElementById('productField');
+        const categoryField = document.getElementById('categoryField');
+        const offerForm = document.getElementById('offerForm');
+        const discountedPriceInput = document.getElementById('discountedPrice');
+        const productSelect = document.getElementById('product'); // Define productSelect here
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+
+        // Function to toggle between product and category fields
+        offerFor.addEventListener('change', function () {
+            if (this.value === 'product') {
+                productField.style.display = 'flex';
+                categoryField.style.display = 'none';
+            } else if (this.value === 'category') {
+                productField.style.display = 'none';
+                categoryField.style.display = 'flex';
+            } else {
+                productField.style.display = 'none';
+                categoryField.style.display = 'none';
+            }
+        });
+
+        // Handle date validation
+        startDate.addEventListener('change', function () {
+            const startValue = new Date(this.value);
+            endDate.value = ''; // Clear end date
+            if (startValue) {
+                endDate.setAttribute('min', this.value);
+            } else {
+                endDate.removeAttribute('min');
+            }
+        });
+
+        endDate.addEventListener('change', function () {
+            const startValue = new Date(startDate.value);
+            const endValue = new Date(this.value);
+            if (startValue && endValue && endValue < startValue) {
+                alert("End date must be after the start date.");
+                this.value = '';
+            }
+        });
+
+        // Calculate discounted price
+        function calculateDiscountedPrice() {
+            const selectedProduct = productSelect ? productSelect.options[productSelect.selectedIndex] : null;
+            if (selectedProduct) {
+                const price = parseFloat(selectedProduct.getAttribute('data-price')) || 0;
+                const percentage = parseFloat(document.getElementById('offerPercentage').value.trim()) || 0;
+                const discount = (price * percentage) / 100;
+                const discountedPrice = price - discount;
+                discountedPriceInput.value = `${Math.round(discountedPrice)}`;
+             //   discountedPriceField.style.display = 'flex';
+            } else {
+                discountedPriceField.style.display = 'none';
+            }
+        }
+
+        // Recalculate discounted price on product or percentage change
+        if (productSelect) {
+            productSelect.addEventListener('change', calculateDiscountedPrice);
+        }
+        document.getElementById('offerPercentage').addEventListener('input', calculateDiscountedPrice);
+
+        // Form validation
+        function isEmptyOrSpaces(str) {
+            return str === null || str.match(/^ *$/) !== null;
+        }
+
+        function validateForm() {
+            let isValid = true;
+
+            // Clear all previous error messages
+            document.querySelectorAll('span[id$="_err"]').forEach(span => span.textContent = '');
+
+            // Validate Offer Name
+            const offerName = document.getElementById('offerName').value.trim();
+            if (!offerName) {
+                document.getElementById('offerName_err').textContent = 'Offer Name is required and cannot be just spaces';
+                isValid = false;
+            }
+
+            // Validate Start Date and End Date
+            const startDateValue = document.getElementById('startDate').value;
+            const endDateValue = document.getElementById('endDate').value;
+            if (!startDateValue) {
+                document.getElementById('startDate_err').textContent = 'Start Date is required';
+                isValid = false;
+            }
+            if (!endDateValue) {
+                document.getElementById('endDate_err').textContent = 'End Date is required';
+                isValid = false;
+            }
+
+            // Validate Offer For
+            const offerForValue = document.getElementById('offerFor').value;
+            if (!offerForValue) {
+                document.getElementById('offerFor_err').textContent = 'Please select Offer For';
+                isValid = false;
+            }
+
+            // Validate Offer Percentage
+            const offerPercentage = document.getElementById('offerPercentage').value.trim();
+            if (!offerPercentage || isEmptyOrSpaces(offerPercentage)) {
+                document.getElementById('offerPercentage_err').textContent = 'Please enter Discount Percentage';
+                isValid = false;
+            }
+
+            // Validate Description
+            const description = document.getElementById('description').value.trim();
+            if (!description || isEmptyOrSpaces(description)) {
+                document.getElementById('description_err').textContent = 'Description is required and cannot be just spaces';
+                isValid = false;
+            }
+          const exce = validateOfferPercentage()
+          if(exce===false){
+            isValid = false;
+          }
+            return isValid;
+        }
+
+        // Form submission
+        offerForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            if (validateForm()) {
+                const offerName = document.getElementById('offerName').value.trim();
+                const startDateValue = document.getElementById('startDate').value;
+                const endDateValue = document.getElementById('endDate').value;
+                const offerForValue = document.getElementById('offerFor').value;
+                const product = productSelect ? productSelect.value : '';
+                const category = document.getElementById('category') ? document.getElementById('category').value : '';
+                const offerPercentage = document.getElementById('offerPercentage') ? document.getElementById('offerPercentage').value.trim() : '';
+                const description = document.getElementById('description').value.trim();
+                const discountedPrice = document.getElementById('discountedPrice').value;
+                document.getElementById('erroMessage').textContent =''
+                let price = 0;
+                if (productSelect) {
+                    const selectedOption = productSelect.options[productSelect.selectedIndex];
+                    price = selectedOption.getAttribute('data-price');
+                }
+
+                // Construct data object
+                const data = {
+                    offerName: offerName,
+                    startDate: startDateValue,
+                    endDate: endDateValue,
+                    offerFor: offerForValue,
+                    product: product,
+                    category: category,
+                    offerPercentage: offerPercentage,
+                    description: description,
+                    price: price,
+                    discountedPrice: discountedPrice
+                };
+
+                // Collect form data
+                fetch('/admin/saveOffer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            //alert('Offer added successfully!');
+                            window.location.href = '/admin/offers'; // Redirect to Offers page
+                        } else {alert(data)
+                                  return response.json().then(errData => {
+                                    // Throw the error so it gets caught in the catch block
+                                    throw errData;
+                                });
+                            alert('Error in adding offer. Please try again.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                          const errorDiv = document.getElementById('erroMessage');
+    
+    // Set the error message
+    errorDiv.textContent = error.message || 'An unexpected error occurred.';
+    
+    // Add the 'alert-danger' class
+    errorDiv.classList.add('alert-danger');
+                    });
+            }
+        });
+    });
+</script>
+
+</html>

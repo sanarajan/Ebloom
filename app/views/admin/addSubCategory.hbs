@@ -1,0 +1,127 @@
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Add Sub Category</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item">Sub Category</li>
+        {{!-- <li class="breadcrumb-item active">Layouts</li> --}}
+      </ol>
+    </nav>
+  </div><!-- End Page Title -->
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-10">
+
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title"></h5>
+
+            {{#if errorMessage}}
+            <div class="alert alert-danger"> {{errorMessage}}</div>
+
+            {{/if}}
+            <!-- Horizontal Form -->
+            <form id="subcategoryForm" action="/admin/addSubCategory" method="post">
+              <div class="row mb-3">
+                <label for="inputEmail3" class="col-sm-3 col-form-label">Sub Category Name</label>
+                <div class="col-sm-9">
+                  <input type="text" name="subCategoryName" id="subCategoryName" class="form-control">
+                  <div id="subCategoryName_error" style="color: red;"></div>
+
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputEmail3" class="col-sm-3 col-form-label">Category</label>
+                <div class="col-sm-9">
+                  <select class="form-control" name="categoryId" id="categoryId">
+                    <option value="">--Select--</option>
+                    {{#each categories}}
+                    <option value="{{this._id}}">{{this.categoryName}}</option>
+                    {{/each}}
+                  </select>
+                  <div id="categoryId_error" style="color: red;"></div>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <label for="inputEmail3" class="col-sm-3 col-form-label">Description</label>
+                <div class="col-sm-9">
+                  <textarea class="form-control" name="description" id="description"></textarea>
+                  <div id="description_error" style="color: red;"></div>
+                </div>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </form><!-- End Horizontal Form -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main><!-- End #main -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    function subCategoryValidation(event) {
+      const subCategoryName = document.getElementById('subCategoryName').value.trim();
+      const categoryId = document.getElementById('categoryId').value;
+      const description = document.getElementById('description').value.trim();
+
+      const subCategoryName_error = document.getElementById('subCategoryName_error');
+      const categoryId_error = document.getElementById('categoryId_error');
+      const description_error = document.getElementById('description_error');
+
+      let valid = true;
+
+      // Clear previous error messages
+      subCategoryName_error.textContent = "";
+      categoryId_error.textContent = "";
+      description_error.textContent = "";
+
+      if (!subCategoryName) {
+        subCategoryName_error.textContent = "Field Required";
+        valid = false;
+      }
+
+      if (!categoryId) {
+        categoryId_error.textContent = "Field Required";
+        valid = false;
+      }
+
+      if (!description) {
+        description_error.textContent = "Field  Required";
+        valid = false;
+      }
+
+      if (!valid) {
+        event.preventDefault();
+      }
+    }
+
+    document.getElementById('subcategoryForm').addEventListener('submit', subCategoryValidation);
+  });
+
+
+  document.addEventListener("DOMContentLoaded", vanishError);
+  function vanishError() {
+    const inputs = document.querySelectorAll("input,textarea,select");
+    inputs.forEach((input) => {
+      let act = ""
+      if (input.tagName === "INPUT" || input.tagName === "TEXTAREA") {
+        act = "keyup"
+      }
+      if (input.tagName === "SELECT") {
+        act = "change"
+      }
+      input.addEventListener(act, function (event) {
+        const target = event.target;
+        const errorElement = document.getElementById(`${target.id}_error`);
+        errorElement.innerHTML = "";
+      });
+    });
+  }
+</script>

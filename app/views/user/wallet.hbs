@@ -1,0 +1,267 @@
+<style>
+    body {
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+
+    .green-e {
+        color: #4CAF50;
+        /* Green color */
+    }
+
+    .wallet-balance {
+        background-color: #007bff;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .wallet-balance h2 {
+        margin: 0;
+        font-size: 36px;
+    }
+
+    .wallet-balance p {
+        margin: 5px 0 0;
+        font-size: 18px;
+    }
+
+    .transaction-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .transaction-item {
+        padding: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .transaction-item:last-child {
+        border-bottom: none;
+    }
+
+    .transaction-item h6 {
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .transaction-item p {
+        margin: 0;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .add-funds {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 20px;
+        cursor: pointer;
+        display: block;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .add-funds:hover {
+        background-color: #218838;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .sidebar {
+        background-color: #fff;
+        border-right: 1px solid #ddd;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .sidebar .nav-link {
+        color: #333;
+    }
+
+    .sidebar .nav-link.active {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+
+    .navbar-nav .nav-link {
+        margin-left: 10px;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pagination-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .pagination-button:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .pagination-button.active {
+        background-color: #0056b3;
+        cursor: default;
+    }
+</style>
+
+<!-- Wallet Body Content -->
+<div class="col-md-9 content">
+    <div class="wallet-balance mb-4">
+        <h2>Rs.<span id="totalBalance">{{wallet.Balance}}</span></h2>
+        <p>Wallet Balance</p>
+    </div>
+
+    <!-- Add Funds Section -->
+    <div class="add-funds" data-toggle="modal" data-target="#addFundsModal">
+        Add Funds
+    </div>
+
+    <!-- Recent Transactions Section -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">Recent Transactions</h5>
+        </div>
+        <div class="card-body transaction-list">
+            {{#each wallet.History}}
+            <div class="transaction-item">
+                <h6>{{this.TransactionType}} - Rs.{{this.Amount}}</h6>
+                <p>{{this.Date}}</p>
+            </div>
+            {{/each}}
+        </div>
+       
+    </div>
+</div>
+</div>
+</div>
+
+ <div class="pagination-container mb-3" id="pagination-container">
+            <button class="pagination-button" id="prev-page" disabled>Previous</button>
+            <div id="page-buttons"></div>
+            <button class="pagination-button" id="next-page" disabled>Next</button>
+        </div>
+<!-- Add Funds Modal -->
+<div class="modal fade" id="addFundsModal" tabindex="-1" role="dialog" aria-labelledby="addFundsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addFundsModalLabel">Add Funds</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/wallet/addFunds" method="POST">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="amount">Amount</label>
+                        <input type="number" class="form-control" id="amount" name="amount" min="1" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Funds</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let currentPage = 1;
+        let totalPages = 1;
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const pageButtonsContainer = document.getElementById('page-buttons');
+
+        function fetchTransactions(page) {
+            fetch(`/fetchWallet?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.wallet && data.wallet.History.length > 0) {
+                        const totalBalance = document.getElementById('totalBalance')
+                       totalBalance.textContent= data.wallet.Balance;
+                        // Update the transaction list
+                        const transactionList = document.querySelector('.transaction-list');
+                        transactionList.innerHTML = data.wallet.History.map(transaction => `
+                        <div class="transaction-item">
+                            <h6>${transaction.TransactionType} - Rs.${transaction.Amount}</h6>
+                            <p>${new Date(transaction.Date).toLocaleDateString()}</p>
+                        </div>
+                    `).join('');
+
+                        // Update pagination
+                        currentPage = data.currentPage;
+                        totalPages = data.totalPages
+                        updatePagination(data.totalPages);
+                    }else{
+
+                    }
+                })
+                .catch(error => console.error('Error fetching transactions:', error));
+        }
+
+        function updatePagination(totalPages) {
+            pageButtonsContainer.innerHTML = ''; // Clear previous buttons
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = 'pagination-button';
+                pageButton.textContent = i;
+
+                if (i === currentPage) {
+                    pageButton.disabled = true;
+                    pageButton.classList.add('active');
+                }
+
+                pageButton.addEventListener('click', () => {
+                    fetchTransactions(i);
+                });
+
+                pageButtonsContainer.appendChild(pageButton);
+            }
+
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages;
+        }
+
+        prevPageBtn.addEventListener('click', function () {
+            if (currentPage > 1) {
+                fetchTransactions(currentPage - 1);
+            }
+        });
+
+        nextPageBtn.addEventListener('click', function () {
+            if (currentPage < totalPages) {
+                fetchTransactions(currentPage + 1);
+            }
+        });
+
+        // Initial load
+        fetchTransactions(currentPage);
+    });
+
+</script>
+<!-- Bootstrap JS and dependencies -->

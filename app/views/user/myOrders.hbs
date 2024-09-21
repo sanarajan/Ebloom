@@ -1,0 +1,807 @@
+<style>
+    /* Custom Styles */
+    .content-container {
+        width: 70%;
+        /* Full width of the viewport */
+        padding: 0 15px;
+        /* Optional padding for content spacing */
+        box-sizing: border-box;
+        /* Include padding in width */
+    }
+
+    .content-row {
+        display: flex;
+        padding: 15px 20px;
+        /* Increased padding for better spacing */
+        margin: 15px 0;
+        /* Space between rows (top and bottom) */
+        border-radius: 8px;
+        /* Rounded corners */
+        background-color: #fff;
+        /* White background */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        /* Subtle shadow effect */
+        box-sizing: border-box;
+        align-items: center;
+        /* Align items vertically center */
+    }
+
+    .content-col {
+        flex: 1;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .content-image img {
+        max-width: 100%;
+        max-height: 75px;
+    }
+
+    .content-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-name {
+        font-size: 16px;
+        /* Adjust font size as needed */
+        font-weight: bold;
+    }
+
+    .product-category {
+        font-size: 14px;
+        /* Adjust font size as needed */
+        color: #555;
+    }
+
+    .content-price {
+        text-align: left;
+        padding-right: 11px;
+        /* Extra space from the next field */
+    }
+
+    .content-info {
+        text-align: right;
+    }
+
+    .content-info div {
+        margin-bottom: 5px;
+        /* Adjust spacing between lines */
+    }
+
+    .rate-review {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 10px;
+    }
+
+    .rate-review img {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+
+    .cancel-button {
+        background-color: #d9534f;
+        /* Red color for the button */
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 14px;
+        /* Adjust font size as needed */
+    }
+
+    .cancel-button:hover {
+        background-color: #c9302c;
+        /* Darker red on hover */
+    }
+
+    .footer {
+        width: 100%;
+        background: #000;
+        /* Ensure footer background color is black */
+        color: #fff;
+        /* Ensure text color is white */
+        padding: 15px 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        bottom: 0;
+        /* Add your existing footer styles here */
+    }
+
+    .orders-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    /* Optional: Styles for Order Details Modal Content */
+    #orderDetailsContent {
+        /* Add padding or margins as needed */
+    }
+
+    .product-detail img {
+        border-radius: 5px;
+    }
+
+    .product-detail p {
+        margin: 0.2rem 0;
+    }
+
+    .pagination-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        margin: 0 5px;
+        cursor: pointer;
+    }
+
+    .pagination-button:disabled {
+        background-color: #ccc;
+        cursor: default;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    .order-group {
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        /* Light background for each order */
+    }
+
+    .order-header {
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        font-weight: bold;
+        display: flex;
+        font-size: 13px;
+        justify-content: space-between;
+
+    }
+
+    .order-header p {
+        margin: 5px 0;
+        /* Adds space between each paragraph */
+    }
+
+    .order-header div {
+        margin-top: 10px;
+        /* Adds space above the 'Ordered' date */
+    }
+
+    .reorder-button {
+        margin-top: 10px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .reorder-button:hover {
+        background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .reorder-button:active {
+        transform: translateY(0);
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+
+<!-- Main Content -->
+<div id="content-container" class="content-container">
+
+    <!-- Repeat .content-row for additional items -->
+</div>
+
+
+<!-- Pagination Controls -->
+
+
+<div class="content-container text-end" style="width:95%">
+    <div class="pagination-container mt-3 mb-3" id="pagination-container">
+        <button class="pagination-button">Previous</button>
+        <button class="pagination-button">1</button>
+        <button class="pagination-button" disabled>2</button>
+    </div>
+    <div id="data-container"></div>
+</div>
+
+{{!-- modal for cancel --}}
+<!-- Cancel Order Modal -->
+<div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="cancelReason">Select Reason for Cancellation</label>
+                    <select class="form-control" id="cancelReason" onchange="handleReasonChange(this)">
+                        <option value="" disabled selected>Select a reason</option>
+                        <option value="Found a better price">Found a better price</option>
+                        <option value="Order delay">Order delay</option>
+                        <option value="Changed my mind">Changed my mind</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group d-none" id="otherReasonContainer">
+                    <label for="otherReason">Please specify your reason</label>
+                    <textarea class="form-control" id="otherReason" rows="3"></textarea>
+                </div>
+                <input type="hidden" id="orderIdToCancel">
+                <input type="text" id="productIdToCancel">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitCancelOrder()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{!-- return modal --}}
+<div class="modal fade" id="returnOrderModal" tabindex="-1" role="dialog" aria-labelledby="returnOrderModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="returnOrderModalLabel">Return Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="returnReason">Select Reason for Return</label>
+                    <select class="form-control" id="returnReason">
+                        <option value="" disabled selected>Select a reason</option>
+                        <option value="Defective product">Defective product</option>
+                        <option value="Wrong item delivered">Wrong item delivered</option>
+                        <option value="Item no longer needed">Item no longer needed</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group d-none" id="otherReturnReasonContainer">
+                    <label for="otherReturnReason">Please specify your reason</label>
+                    <textarea class="form-control" id="otherReturnReason" rows="3"></textarea>
+                </div>
+                <input type="hidden" id="orderIdToReturn">
+                <input type="hidden" id="productIdToReturn">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="submitReturnOrder()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{!-- order detail modal --}}
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" role="dialog" aria-labelledby="orderDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document"> <!-- Use modal-lg for a larger modal -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="orderDetailsContent">
+                    <!-- Order details will be populated here dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const paginationContainer = document.getElementById('pagination-container');
+    const dataContainer = document.getElementById('data-container');
+    let currentPage = 1;
+    let totalPages = 1;
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            fetchOrder(currentPage);// Load the first page
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        }
+    });
+
+    function fetchOrder(page = 1) {
+        fetch(`/fetchOrders?page=${page}`, {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(data => {
+                clearPreviousData();
+                if (data && Array.isArray(data.updatedOrders)) {
+                    renderOrders(data.updatedOrders);
+                    totalPages = data.totalPages;
+                    createPaginationButtons();
+                } else {
+                    //  if(data.success)
+                    if (data.success === false) {
+                        const container = document.getElementById('content-container');
+                        container.innerHTML = ''; // Clear previous content
+                        container.innerHTML += '<h4 class="orders-title mt-5">My Orders</h4>';
+                        const orderElement = document.createElement('div');
+                        orderElement.className = 'content-row';
+                        orderElement.innerHTML = '<h4>No order found</h4>';
+                        container.appendChild(orderElement);
+                        paginationContainer.style.display = 'none'
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to fetch orders. Please try again later.',
+                    confirmButtonText: 'OK'
+                });
+            });
+    }
+
+
+    // Function to clear previous data
+    function clearPreviousData() {
+        const contentContainer = document.getElementById('content-container');
+
+        if (contentContainer) {
+            contentContainer.innerHTML = ''; // Clear the existing content
+        } else {
+            console.error('Element with ID "content-container" not found.');
+        } // Clear the existing content
+    }
+    function createPaginationButtons() {
+        paginationContainer.innerHTML = ''; // Clear previous buttons
+
+        // Create Previous button
+        if (currentPage > 1) {
+            const prevButton = document.createElement('button');
+            prevButton.textContent = 'Previous';
+            prevButton.className = 'pagination-button';
+            prevButton.addEventListener('click', () => {
+                currentPage--;
+                fetchOrder(currentPage);
+            });
+            paginationContainer.appendChild(prevButton);
+        }
+
+        // Create Page buttons
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            pageButton.className = 'pagination-button';
+            if (i === currentPage) {
+                pageButton.disabled = true; // Disable the button for the current page
+            }
+            pageButton.addEventListener('click', () => {
+                currentPage = i;
+                fetchOrder(currentPage);
+            });
+            paginationContainer.appendChild(pageButton);
+        }
+
+        // Create Next button
+        if (currentPage < totalPages) {
+            const nextButton = document.createElement('button');
+            nextButton.textContent = 'Next';
+            nextButton.className = 'pagination-button';
+            nextButton.addEventListener('click', () => {
+                currentPage++;
+                fetchOrder(currentPage);
+            });
+            paginationContainer.appendChild(nextButton);
+        }
+    }
+    //end
+    //next function
+    const updatedOrders = [
+        // Place your data array here
+        // ...
+    ];
+
+    function renderOrders(orders) {
+    const container = document.getElementById('content-container');
+    container.innerHTML = ''; // Clear previous content
+    container.innerHTML += '<h4 class="orders-title mt-5">My Orders</h4>';
+
+    // Loop through each order
+    orders.forEach((order, index) => {
+        const orderJson = JSON.stringify(order);
+
+        // Create a div to hold the entire order
+        const orderElement = document.createElement('div');
+        orderElement.className = `order-group`; // Add a class for the order group
+
+        // Add an order header to distinguish different orders
+        orderElement.innerHTML += `
+            <div class="order-header">
+                <p>Order ID: <br>${order.orderId}</p>
+                <p>Order status: ${order.paymentStatus}</p>
+                <p>Pay Method : ${order.paymentMethod}</p>
+                <div>Ordered: ${new Date(order.createdAt).toLocaleDateString()}</div>
+            </div>
+        `;
+
+        let reorderButtonHTML = '';
+
+        // Check if payment status is "Failed" and generate the button HTML
+        if (order.paymentStatus === "Failed") {
+            reorderButtonHTML = `
+                <button class="reorder-button" onclick="reorderOrder('${order._id}')">
+                    Reorder
+                </button>
+            `;
+        }
+
+        // Append the "Reorder" button HTML right after the "Order status" paragraph
+        const orderStatusElement = orderElement.querySelector('.order-header p:nth-child(2)');
+        orderStatusElement.innerHTML += reorderButtonHTML;
+        // Loop through each product in the order and group them inside the order div
+        order.orderedProducts.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'content-row';
+
+            productElement.innerHTML = `
+                <div class="content-image">
+                    <img src="${product.productId.thumbnailPaths[0] || 'https://via.placeholder.com/75'}" alt="Product Image">
+                </div>
+                <div class="content-col">
+                    <div class="content-details">
+                        <div class="product-name">${product.productId.productName}</div>
+                        <div class="product-category">${product.category.categoryName}</div>
+                    </div>
+                </div>
+            `;
+
+            // Conditionally add cancel/return buttons and price section between the content columns
+            if (order.paymentStatus !== "Failed") {
+                productElement.innerHTML += `
+                    <div class="content-col">
+                        ${product.orderStatus === "Order Placed" ? `<button class="cancel-button" onclick="cancelOrder('${order._id}','${product.productId._id}')">Cancel</button>` : ''}
+                        ${product.orderStatus === "Delivered" ? `<button class="cancel-button" onclick="returnOrder('${order._id}','${product.productId._id}')">Return</button>` : ''}
+                    </div>
+                `;
+            }
+
+            // Price section
+            productElement.innerHTML += `
+                <div class="content-col content-price">
+                    ₹${product.itemTotalPrice}
+                </div>
+            `;
+
+            // Product status and details section
+            if (order.paymentStatus !== "Failed") {
+                productElement.innerHTML += `
+                    <div class="content-col content-info">
+                        ${product.orderStatus === "Cancelled" || product.orderStatus === "Pending Cancellation" ? `<div style="margin-left:-30px"><i class="fas fa-times-circle" style="color:red;"></i>${product.orderStatus} on ${new Date(product.deliveryDate).toLocaleDateString()}</div><div>Reason:${product.cancellation.reason || 'Not specified'}</div>` : ''}
+                        ${product.orderStatus === "Shipped" || product.orderStatus === "Order Placed" ? `<div style="margin-left:-30px"><i class="fas fa-truck" style="color:blue;"></i>${product.orderStatus} - Delivery expected by ${new Date(product.deliveryDate).toLocaleDateString()}</div>` : ''}
+                        ${product.orderStatus === "Delivered" ? `<div style="margin-left:-25px"><i class="fas fa-box" style="color:green;"></i>${product.orderStatus} on ${new Date(product.deliveryDate).toLocaleDateString()}</div>` : ''}
+                        ${product.orderStatus === "Returned" ? `<div style="margin-left:-30px"><i class="fas fa-undo" style="color:orange;"></i> Product ${product.orderStatus}</div>` : ''}
+                        ${product.orderStatus === "Delivered" ? `<div style="margin-left:-30px" class="rate-review"><img src="https://via.placeholder.com/16" alt="Rate Icon"><a href="#">Rate & Review Product</a></div>` : ''}
+                    </div>
+                `;
+            }
+
+            productElement.addEventListener('click', function (event) {
+                if (!event.target.closest('button')) {
+                    showOrderDetails(order, product); // Call function to show order details
+                }
+            });
+
+            // Append each product to the order group
+            orderElement.appendChild(productElement);
+        });
+console.log( order.orderedProducts)
+      console.log(order.address)
+        // Add "Invoice PDF" button after product list (for the whole order, not per product)
+       
+      
+ if (order.paymentStatus === "Completed") {
+        const downloadButton = document.createElement('button');
+        downloadButton.className = 'invoice-button';
+        downloadButton.textContent = 'Download Invoice';
+        downloadButton.style = `
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;`;
+
+        // Add event listener for the download button
+        downloadButton.addEventListener('click', function () {
+            downloadInvoice(
+                order._id, 
+                order.orderedProducts, 
+                order.totalPrice, 
+                order.totalOfferPrice || 0, 
+                order.deliveryCharge || 0, 
+                order.packingCharge || 0, 
+                order.totalAmount,
+                order.invoiceNo,
+                order.address
+            );
+        });
+
+        // Append the download button to the order element
+        orderElement.appendChild(downloadButton);
+ }
+        // Append the order group to the container
+        container.appendChild(orderElement);
+    });
+
+    // Log total orders
+    console.log(`Total Orders: ${orders.length}`);
+}
+
+
+
+
+
+    // Call the function to render the orders
+    renderOrders(updatedOrders);
+
+
+    function reorderOrder(orderId) {
+        // Redirect to the reorder page with the order ID in the URL
+        window.location.href = `/reOrder/${orderId}`;
+    }
+
+    //cancel order
+
+    function handleReasonChange(select) {
+        const otherReasonContainer = document.getElementById('otherReasonContainer');
+        if (select.value === 'Other') {
+            otherReasonContainer.classList.remove('d-none');
+        } else {
+            otherReasonContainer.classList.add('d-none');
+        }
+    }
+
+    function cancelOrder(orderId, prodId) {
+        document.getElementById('orderIdToCancel').value = orderId;
+        document.getElementById('productIdToCancel').value = prodId;
+        $('#cancelOrderModal').modal('show');
+    }
+
+    async function submitCancelOrder() {
+        const orderId = document.getElementById('orderIdToCancel').value;
+        const cancelReason = document.getElementById('cancelReason').value;
+        const otherReason = document.getElementById('otherReason').value;
+        const productId = document.getElementById('productIdToCancel').value;
+
+        const reason = cancelReason === 'Other' ? otherReason : cancelReason;
+
+        if (!reason) {
+            alert('Please select or enter a reason for cancellation.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/cancelOrder`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason, orderId, productId })
+            });
+            const result = await response.json();
+            if (result.success) {
+                location.reload();
+            } else {
+                alert('Failed to cancel order');
+            }
+        } catch (error) {
+            console.error('Error canceling order:', error);
+        }
+    }
+
+    //return order
+    function returnOrder(orderId, prodId) {
+        document.getElementById('orderIdToReturn').value = orderId;
+        document.getElementById('productIdToReturn').value = prodId;
+        $('#returnOrderModal').modal('show');
+    }
+
+    async function submitReturnOrder() {
+        const orderId = document.getElementById('orderIdToReturn').value;
+        const returnReason = document.getElementById('returnReason').value;
+        const otherReason = document.getElementById('otherReturnReason').value;
+        const productId = document.getElementById('productIdToReturn').value;
+        const reason = returnReason === 'Other' ? otherReason : returnReason;
+        if (!reason) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Please select or enter a reason for returning the product.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        try {
+            const response = await fetch(`/returnOrder`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ reason, orderId, productId })
+            });
+            const result = await response.json();
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Returned!',
+                    text: 'Your product has been returned successfully.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    location.reload(); // Reload the page after the user clicks 'OK'
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to return the product.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        } catch (error) {
+            console.error('Error returning product:', error);
+        }
+    }
+
+    //show order detail
+    function showOrderDetails(order, prod) {
+        const modalContent = document.getElementById('orderDetailsContent');
+        console.log(prod)
+        let ofrSve = 0;
+        let discSve = 0
+        ofrSve = prod.discountOffer;
+        discSve = prod.discountProduct;
+        if (!prod.discountProduct) {
+            discSve = 0
+        }
+        if (!prod.discountOffer) {
+            ofrSve = 0
+        }
+        let totSave = discSve + ofrSve
+        // Construct HTML content for order details
+        let productsHtml = '';
+        let prodDelivry = ""
+        let prodOrderStatus = "Failed"
+        if (order.paymentStatus !== "Failed") {
+            prodDelivry = (prod.deliveryDate) ? new Date(prod.deliveryDate).toLocaleDateString() : ''
+            prodOrderStatus = prod.orderStatus
+        }
+        productsHtml += `
+                    <div class="product-detail mb-3">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img src="${prod.image || 'https://via.placeholder.com/75'}" alt="Product Image" class="img-fluid">
+                            </div>
+                            <div class="col-md-9">
+                                <p><strong>Product Name:</strong> ${prod.productName}</p>
+                                <p><strong>Category:</strong> ${prod.category.categoryName}</p>
+                                <p><strong>Quantity:</strong> ${prod.quantity}</p>
+                                <p><strong>Price:</strong> ₹${prod.offerPrice}</p>
+                                <p><strong>Order Status:</strong> ${prodOrderStatus}</p>
+                                ${prod.orderStatus === "Cancelled" || prod.orderStatus === "Pending Cancellation" ? `<p><strong>Cancellation Reason:</strong> ${prod.cancellation.reason || 'Not specified'}</p>` : ''}
+                                <!-- Add more product fields as needed -->
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                `;
+
+
+        // Add overall order details
+        modalContent.innerHTML = `
+                <h5>Order ID: ${order.orderId}</h5>
+                <p><strong>Order Date:</strong> ${new Date(order.createdAt).toLocaleDateString()}</p>
+                <p><strong>Delivery Date:</strong> ${prodDelivry}</p>
+                <hr>
+                <h6>Product Details:</h6>
+                ${productsHtml}
+                <h6>Shipping Information:</h6>
+                <p><strong>Address:</strong> ${order.address.house + `,` + order.address.place + `,` + order.address.city + `,<br>` + order.address.district + `,` + order.address.state + `,` + order.address.pincode}</p>
+                  <p><strong>Total Price:</strong> ₹${prod.itemTotalPrice}</p>
+                 <p><strong>Total offer Price:</strong> ₹${prod.offerPrice * prod.quantity}</p>
+                 <p><strong>Coupon Discount:</strong> ${prod.discountProduct}</p>
+              <p><strong>Offer Discount:</strong> ${prod.itemTotalPrice - (prod.offerPrice * prod.quantity)}</p>
+
+                <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+                <p><strong>Delivery Charge:</strong> ${order.deliveryCharge}</p>
+                <p><strong>Packing Charge:</strong> ${order.packingCharge}</p>
+              <p><strong>Total Saved:</strong> ${totSave}</p>
+                <p><strong>Total Amount:</strong> ₹${order.totalAmount}</p>
+                <!-- Include more fields as necessary -->
+            `;
+
+        // Show the modal
+        $('#orderDetailsModal').modal('show');
+
+    }
+    //invoice download
+   function downloadInvoice(orderId, productDetails, totalPrice, totalOfferPrice, deliveryCharge, packingCharge, totalAmount,address) {
+    // Prepare the data to send
+      console.log(address)
+    const invoiceData = {
+        orderId,
+        productDetails,
+        totalPrice,
+        totalOfferPrice,
+        deliveryCharge,
+        packingCharge,
+        totalAmount,
+        address
+        
+    };
+
+    // Send the data to the server
+    fetch('/invoiceDownload', {
+       method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(invoiceData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to download invoice');
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        // Create a link to download the PDF
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `invoice-${orderId}.pdf`; // Set the correct file name
+        document.body.appendChild(a);
+        a.click();
+        a.remove();  // Remove the link after the click
+    })
+    .catch(error => console.error('Error downloading invoice:', error));
+}
+
+</script>
+<!-- Footer -->

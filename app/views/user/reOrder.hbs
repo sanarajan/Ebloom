@@ -1,0 +1,362 @@
+<style>
+    /* Custom Styles */
+    .content-container {
+        width: 70%;
+        padding: 20px;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+
+    .order-header {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .order-header p {
+        margin: 5px 0;
+    }
+
+    .content-row {
+        display: flex;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        align-items: center;
+    }
+
+    .content-col {
+        flex: 1;
+        padding: 0 10px;
+    }
+
+    .content-image img {
+        max-width: 100%;
+        max-height: 100px;
+        border-radius: 4px;
+    }
+
+    .content-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .product-category {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .content-price,
+    .content-info,
+    .order-summary {
+        text-align: left;
+        font-weight: bold;
+    }
+
+    .order-summary {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #f1f1f1;
+        border-radius: 8px;
+    }
+
+    .summary-item {
+        margin-bottom: 10px;
+    }
+
+    .reorder-button {
+        background-color: #007bff;
+        color: #ffffff;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 15px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 16px;
+        margin-top: 10px;
+    }
+
+    .reorder-button:hover {
+        background-color: #0056b3;
+    }
+
+    .footer {
+        width: 100%
+    }
+</style>
+
+<!-- Main Content -->
+<div id="content-container" class="content-container">
+    <div class="order-header text-start">
+        <h4>Order Details</h4>
+        <p>Order ID: <span id="order-id"></span></p>
+        <p>Order Status: <span id="order-status"></span></p>
+        <p>Ordered On: <span id="order-date"></span></p>
+        <p id="coupon-discount"></p>
+    </div>
+    <div id="content-product" class="content-product"></div>
+ <input type="hidden" name="orderID" id="orderID">
+    <!-- Summary Section -->
+    <div id="order-summary" class="order-summary" style="display:none;">
+        <div class="summary-item">Total MRP: ₹<span id="totalMRP"></span></div>
+
+        <div class="summary-item">Offer amount: ₹<span id="subtotal"></span></div>
+        <div class="summary-item">Discount: ₹<span id="discount"></span></div>
+        <div class="summary-item">Delivery Charge: ₹<span id="delivery-charge"></span></div>
+        <div class="summary-item">Packaging Fee: ₹<span id="packaging-fee"></span></div>
+        <div class="summary-item">Total Amount: ₹<span id="total-amount"></span></div>
+    </div>
+    <button id="razorpay-button" style="display:none;">Pay Now</button>
+    <button id="reorder_button" class="reorder-button" onclick="reorder()">Reorder</button>
+
+</div>
+
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const orderId = '{{orderId}}'; // Ensure this is correctly populated
+
+        if (orderId) {
+            try {
+                await selectedOrder(orderId);
+            } catch (error) {
+                console.error('Error fetching order:', error);
+            }
+        }
+    });
+
+    async function selectedOrder(orderId) {
+        try {
+            const response = await fetch(`/selectedOrder/${orderId}`); // Adjust URL to match your backend route
+            const data = await response.json();
+            console.log(data.order);
+
+            if (data && data.success) {
+                renderOrderDetails(data.order);
+            } else {
+                console.error('Failed to fetch order details');
+            }
+        } catch (error) {
+            console.error('Error fetching order details:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to fetch order details. Please try again later.',
+                confirmButtonText: 'OK'
+            });
+        }
+    }
+
+    function renderOrderDetails(orderData) {
+        const container = document.getElementById('content-product');
+        const orderIdElem = document.getElementById('order-id');
+        const orderStatusElem = document.getElementById('order-status');
+        const orderDateElem = document.getElementById('order-date');
+        const couponDiscountElem = document.getElementById('coupon-discount');
+        //   const reorderButton = document.getElementById('reorder-button');
+        
+        if (!container) {
+            console.error('Content container not found');
+            return;
+        }
+
+        if (!orderData || !Array.isArray(orderData) || orderData.length === 0) {
+            console.error('Order data is missing or not an array');
+            return;
+        }
+
+        const order = orderData[0];
+                 document.getElementById('orderID').value=order._id;
+
+
+        if (!order) {
+            console.error('Order data is missing or invalid');
+            return;
+        }
+
+        // Update order header
+        orderIdElem.textContent = order._id;
+        orderStatusElem.textContent = order.paymentStatus;
+        orderDateElem.textContent = new Date(order.createdAt).toLocaleDateString();
+        couponDiscountElem.textContent = order.couponDisc ? `Coupon Applied: ₹${order.couponDisc}` : '';
+
+
+
+        // Clear existing content
+        container.innerHTML = '';
+
+        let subtotal = 0;
+        let totalDiscount = 0;
+
+        // Iterate through each product
+        order.orderedProducts.forEach((product) => {
+            const productTotal = product.itemTotalPrice;
+            const discount = product.offerPrice + (order.couponDisc ? order.couponDisc : 0);
+
+            subtotal += productTotal;
+            totalDiscount = parseInt(product.discountOffer) + parseInt(product.discountProduct);
+
+
+            const productHTML = `
+        <div class="content-row">
+          <div class="content-image">
+            <img src="/${product.image || 'https://via.placeholder.com/100'}" alt="Product Image">
+          </div>
+          <div class="content-col">
+            <div class="content-details">
+              <div class="product-name">${product.productId.productName}</div>
+              <div class="product-category">${product.category.categoryName}</div>
+              <div>Quantity: ${product.quantity}</div>
+              <div>Price: ₹${product.price}</div>
+              <div>Offer Price: ₹${product.offerPrice}</div>
+              <div>Total Discount: ₹${totalDiscount}</div>
+            </div>
+          </div>
+          <div class="content-col content-price">
+            ₹${product.offerPrice * product.quantity}
+          </div>
+        </div>
+      `;
+
+            container.innerHTML += productHTML;
+        });
+
+        const deliveryCharge = order.deliveryCharge || 0;
+        const packagingFee = order.packingCharge || 0;
+        const totalAmount = order.totalAmount;
+
+        // Update summary section
+        document.getElementById('totalMRP').textContent = subtotal;
+
+        document.getElementById('subtotal').textContent = order.totalPrice;
+
+        document.getElementById('discount').textContent = order.totalDiscount;
+        document.getElementById('delivery-charge').textContent = deliveryCharge;
+        document.getElementById('packaging-fee').textContent = packagingFee;
+        document.getElementById('total-amount').textContent = totalAmount;
+
+        document.getElementById('order-summary').style.display = 'block';
+
+
+    }
+
+    async function reorder() {
+        const amount = parseInt(document.getElementById('total-amount').textContent); // Convert to paise
+        const currency = 'INR';
+           const order_Id=  document.getElementById('orderID').value;
+
+        try {
+            // Make an API call to your server to create a Razorpay order
+            const response = await fetch('/createOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ amount, currency,order_Id })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Order ID received from Razorpay
+                const orderId = data.razorpayOrderId;
+                // Initiating Razorpay checkout
+                const options = {
+                    key: 'rzp_test_oMNW7kruQ4TMbO',// Replace with your Razorpay key
+                    amount: amount * 100,
+                    currency: currency,
+                    name: 'Your Company Name',
+                    description: 'Reorder Payment',
+                    order_id: orderId, // Razorpay order ID from the server
+                    handler:async function (response) {
+                        // Handle successful payment
+                        console.log('Payment successful:', response);
+                        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+
+                        const verificationData = {
+                            razorpayPaymentId: response.razorpay_payment_id,
+                            razorpayOrderId: response.razorpay_order_id,
+                            razorpaySignature: response.razorpay_signature
+                          
+                        };
+
+                        // Send payment details back to server for verification
+                        const verifyResponse = await fetch('/verifyPayment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(verificationData)
+                        });
+
+                        if (verifyResponse) {
+                            const verificationResult = await verifyResponse.json();
+                            if (verificationResult.success) {
+                                // Payment verification successful, proceed with order completion
+                                alert("Payment verified successfully and order placed!");
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Payment Successful',
+                                    text: 'Your order has been placed successfully!',
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    window.location.href = '/user/paymenySuccess';
+                                });
+                                //  orderForm.submit(); // Submit the form to finalize the order
+                            } else {
+                                console.error('Error verifying payment:', error);
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Payment Verification Failed',
+                                    text: 'An error occurred while verifying the payment. Please try again.',
+                                    confirmButtonText: 'Retry'
+                                }).then(() => {
+                                    window.location.href = '/user/myOrders';
+                                });
+                            }
+                        } else {
+                            alert("Error in verifying payment. Please contact support.");
+                        }
+                        // You can call another API to update the order status here
+                    },
+                    prefill: {
+                        name: 'Your User Name',
+                        email: 'user@example.com',
+                        contact: '9999999999'
+                    },
+                    theme: {
+                        color: '#007bff'
+                    }
+                };
+
+                const rzp1 = new Razorpay(options);
+
+                // Open Razorpay payment form on button click
+                rzp1.open();
+            } else {
+                console.error('Failed to create Razorpay order');
+                alert('Failed to create Razorpay order. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error creating Razorpay order:', error);
+            alert('Error creating Razorpay order. Please try again.');
+        }
+    }
+
+
+    function cancelOrder(productId) {
+        console.log('Cancel Order button clicked for product:', productId);
+    }
+</script>

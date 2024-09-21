@@ -1,0 +1,119 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Sub Categories</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item">Tables</li>
+        <li class="breadcrumb-item active">Data</li>
+      </ol>
+    </nav>
+    {{#if success}}
+    <div class="alert alert-success">{{success}}</div>
+    {{/if}}
+    {{#if catupdate}}
+    <div class="alert alert-success">{{catupdate}}</div>
+    {{/if}}
+    {{#if subcatupdate}}
+    <div class="alert alert-success">{{subcatupdate}}</div>
+    {{/if}}
+  </div>
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Categories</h5>
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#if subcategories}}
+                {{#each subcategories}}
+                <tr>
+                  <td>{{this.subCategoryName}}</td>
+                  <td>{{this.categoryId.categoryName}}</td>
+                  <td>{{this.description}}</td>
+                  <td id="status{{_id}}">
+                    <button class="btn {{ternary (eq this.isActive true) 'btn-success' 'btn-danger'}}"
+                      onclick="toggleSubCategoryStatus('{{this._id}}')">
+                      {{ternary (eq this.isActive true) 'Active' 'Inactive'}}
+                    </button>
+                  </td>
+                  <td>
+                    <span><a href="/admin/editSubCategory/{{this._id}}"><i class="bi bi-pencil-square"></i></a></span>
+                  </td>
+                </tr>
+                {{/each}}
+                {{/if}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+  function toggleSubCategoryStatus(subCategoryId) {
+    const statusButton = document.querySelector(`#status${subCategoryId} button`);
+    let md = false;
+    let txt = 'Active'
+    if (statusButton.innerText === 'Active') {
+      md = true;
+      txt = 'Inactive'
+    }
+
+    swal({
+      title: "Are you sure?",
+      text: `Do you want to ${txt} the subcategory?`,
+      icon: "warning",
+      buttons: true,
+      dangerMode: md,
+    })
+      .then((willChange) => {
+        if (willChange) {
+          fetch('/admin/subcateDelete', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: subCategoryId })
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                if (data.newStatus === 'Active') {
+                  statusButton.classList.remove('btn-success');
+                  statusButton.classList.add('btn-danger');
+                  statusButton.textContent = 'Inactive';
+
+                } else {
+                  statusButton.textContent = 'Active';
+                  statusButton.classList.remove('btn-danger');
+                  statusButton.classList.add('btn-success');
+
+                }
+                swal("Success!", "The subcategory status has been updated.", "success");
+              } else {
+                console.error('Error updating subcategory status:', data.message);
+                swal("Error", 'Error updating subcategory status: ' + data.message, "error");
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              swal("Error", "An error occurred while updating the subcategory status.", "error");
+            });
+        }
+      });
+  }
+</script>

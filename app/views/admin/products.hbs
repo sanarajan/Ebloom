@@ -1,0 +1,128 @@
+<main id="main" class="main">
+  <div class="pagetitle">
+    <h1>Products</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Products</a></li>
+      </ol>
+    </nav>
+    {{#if productSuccess}}
+    <div class="alert alert-success">{{productSuccess}}</div>
+    {{/if}}
+    {{#if catupdate}}
+    <div class="alert alert-success">{{catupdate}}</div>
+    {{/if}}
+    {{#if general}}
+    <div class="alert alert-danger">{{general}}</div>
+    {{/if}}
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Products</h5>
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Sub Category</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#if products}}
+                {{#each products}}
+                <tr>
+                  <td><img src="/{{this.thumbnailPaths.[0]}}" style="height:30px;width:30px"></td>
+                  <td>{{this.productName}}</td>
+                  <td>{{this.subCategoryId.categoryId.categoryName}}</td>
+                  <td>{{this.subCategoryId.subCategoryName}}</td>
+                  <td>{{this.price}}</td>
+                  <td>{{this.quantity}}</td>
+                  <td id="status{{this._id}}">
+                    <button id="toggleButton{{this._id}}" onclick="toggleProductStatus('{{this._id}}')"
+                      class="btn {{ternary (eq this.isActive true) 'btn-success' 'btn-danger'}}">
+                      {{ternary (eq this.isActive true) "Active" "Inactive"}}
+                    </button>
+                  </td>
+                  <td>
+                    <span><a href="/admin/editProduct/{{this._id}}"><i class="bi bi-pencil-square"></i></a></span>
+                  </td>
+                </tr>
+                {{/each}}
+                {{/if}}
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main><!-- End #main -->
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+  function toggleProductStatus(productId) {
+    const toggleButton = document.querySelector(`#toggleButton${productId}`);
+    const currentStatus = toggleButton.textContent.trim() === 'Active' ? 'Inactive' : 'Active';
+
+    swal({
+      title: "Are you sure?",
+      text: `Do you want to set this product to ${currentStatus}?`,
+      icon: "warning",
+      buttons: {
+        cancel: {
+          text: "Cancel",
+          value: null,
+          visible: true,
+          className: "",
+          closeModal: true,
+        },
+        confirm: {
+          text: "Yes, do it!",
+          value: true,
+          visible: true,
+          className: "btn-danger",
+          closeModal: true
+        }
+      }
+    }).then((willToggle) => {
+      if (willToggle) {
+        fetch(`/admin/toggleProductStatus/${productId}`, {
+          method: 'PATCH',
+        })
+          .then(response => response.json())
+          .then(result => {
+            if (result.success) {
+              if (result.isActive) {
+
+                toggleButton.classList.remove('btn-danger');
+                toggleButton.classList.add('btn-success');
+
+                toggleButton.textContent = 'Active';
+              } else {
+                toggleButton.classList.remove('btn-success');
+                toggleButton.classList.add('btn-danger');
+                toggleButton.textContent = 'Inactive';
+              }
+            } else {
+              swal('Error', 'Error toggling product status: ' + result.message, 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            swal('Error', 'An error occurred while toggling the product status.', 'error');
+          });
+      }
+    });
+  }
+</script>

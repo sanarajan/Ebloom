@@ -1,0 +1,481 @@
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f0f0f0;
+        /* Background color for body */
+    }
+
+    .header {
+        width: 100%;
+        /* Add your existing header styles here */
+    }
+
+    .footer {
+        background: #000;
+        /* Ensure footer background color is black */
+        color: #fff;
+        /* Ensure text color is white */
+        padding: 15px 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        /* Add your existing footer styles here */
+    }
+
+    .content-container {
+        display: flex;
+        flex: 1;
+        padding: 20px;
+        margin-left: 10px;
+    }
+
+    .cart-items {
+        flex: 7;
+        margin-right: 20px;
+    }
+
+    .cart-summary {
+        flex: 3;
+        background: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .cart-summary h4 {
+        margin-top: 0;
+        font-size: 26px;
+        /* Increased font size for heading */
+        line-height: 1.5;
+        /* Increased line height for heading */
+        font-weight: bold;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        /* Increased space between items */
+        font-size: 20px;
+        /* Increased font size */
+        line-height: 1.8;
+        /* Increased line height */
+    }
+
+    .summary-item strong {
+        font-weight: bold;
+        font-size: 22px;
+        /* Larger font size for important details */
+        line-height: 1.8;
+        /* Increased line height */
+    }
+
+    .checkout-button {
+        background-color: #007bff;
+        /* Primary color for button */
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 15px;
+        cursor: pointer;
+        text-align: center;
+        font-size: 20px;
+        /* Increased font size */
+        display: block;
+        width: 100%;
+        margin-top: 30px;
+        line-height: 1.6;
+        /* Line height for the button */
+    }
+
+    .checkout-button:hover {
+        background-color: #0056b3;
+        /* Darker blue on hover */
+    }
+
+    .cart-item {
+        display: flex;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        /* More prominent shadow */
+        padding: 20px;
+        margin-bottom: 20px;
+        align-items: center;
+        height: 180px;
+        /* Increased height for the row */
+    }
+
+    .cart-item img {
+        max-width: 150px;
+        /* Increased width */
+        max-height: 150px;
+        /* Increased height */
+        margin-right: 20px;
+        /* Increased gap between image and name column */
+        border-radius: 8px;
+        object-fit: cover;
+        /* Ensures the image fits within the bounds */
+    }
+
+    .cart-item-details {
+        flex: 1;
+        margin-right: 20px;
+        /* Increased gap for more spacing */
+    }
+
+    .product-name {
+        font-size: 22px;
+        /* Increased font size */
+        font-weight: bold;
+    }
+
+    .product-specification {
+        font-size: 18px;
+        /* Increased font size */
+        color: #555;
+    }
+
+    .product-status {
+        font-size: 18px;
+        /* Increased font size */
+        color: #d9534f;
+        /* Color for out of stock text */
+    }
+
+    .product-price {
+        font-size: 20px;
+        /* Increased font size */
+        font-weight: bold;
+    }
+
+    .product-delivery {
+        font-size: 16px;
+        /* Increased font size */
+        color: #777;
+    }
+
+    .cart-item-actions {
+        text-align: right;
+    }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .quantity-controls button {
+        margin: 0 5px;
+        background: #eee;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px 12px;
+        /* Increased padding for buttons */
+        font-size: 16px;
+        /* Increased font size for better readability */
+    }
+
+    .quantity-controls input {
+        width: 60px;
+        /* Increased width */
+        text-align: center;
+        margin: 0 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        /* Increased font size */
+    }
+
+    .delete-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #d9534f;
+        font-size: 24px;
+        /* Larger icon size */
+    }
+
+    .delete-icon:hover {
+        color: #c9302c;
+    }
+
+    .error {
+        color: green;
+        background-color: orange;
+    }
+
+    .custom-alert {
+        border-radius: 0.55rem;
+        padding: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        background: #e9f7ff;
+        color: #007bff;
+        border: 1px solid #007bff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+
+<!-- Main Content -->
+
+<div class="content-container">
+    <!-- Cart Items Table -->
+    {{#if cartItems.length}}
+    <div class="cart-items" id="cart-items">
+        {{#if cartItems.length}}
+        {{#each cartItems}}
+        <div class="cart-item" data-product-id="{{product._id}}">
+            <div class="cart-item-image">
+                <img src="/{{product.image}}" alt="Product Image">
+            </div>
+            <div class="cart-item-details">
+                <div class="product-name">{{product.name}}</div>
+                <div class="product-specification">{{product.specification}}</div>
+                {{!-- <div class="product-specification">Seller: {{product.seller}}</div> --}}
+                {{!-- <div class="product-price">₹{{product.price}} <span class="offer">₹{{product.offerPrice}}
+                        {{product.offerPercentage}} Off</span></div> --}}
+                <div class="product-price">₹{{product.offerPrice}} <span class="offer"> {{#if product.offerPercentage}}
+   <span class="offer" style="margin-left:5px">Off {{product.offerPercentage}}% </span>
+{{/if}}
+                        </span></div>
+
+                <div class="product-delivery">Delivery by <span class="delivery-date">{{deliveryDate}}</span> | ₹40
+                    Free</div>
+            </div>
+            <div class="cart-item-actions">
+
+                <div class="quantity-controls">
+                    {{#if product.productQuantity}}
+
+                    {{#if (lt product.productQuantity quantity)}}
+                    <span class="error">Quantity exceeds the available stock.<br>Please remove item</span>
+                    {{else}}
+                    <button class="btn btn-secondary" id="{{product._id}}" onclick="changeQuantity(this, -1)">-</button>
+                    <input type="text" class="form-control quantity-input" value="{{quantity}}">
+                    <button class="btn btn-secondary" id="{{product._id}}" onclick="changeQuantity(this, 1)">+</button>
+                    {{/if}}
+                    {{/if}}
+                </div>
+                <div class="delete-icon" onclick="deleteItem(this)">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+        {{else}}
+        <p>Your cart is empty.</p>
+        {{/if}}
+    </div>
+
+    <!-- Cart Summary -->
+    <div class="cart-summary">
+        <h4>Cart Summary</h4>
+        <div class="summary-item">
+            <span>Price ({{productQuantity}} items)</span>
+            <span>₹{{totalPrice}}</span>
+        </div>
+        <div class="summary-item">
+            <span>Discount</span>
+            <span>− ₹{{totalDiscount}}</span>
+        </div>
+        <div class="summary-item">
+            <span>Delivery Charges</span>
+            <span>₹{{deliveryCharges}} </span>
+        </div>
+        <div class="summary-item">
+            <span>Secured Packaging Fee</span>
+            <span>₹{{packagingFee}}</span>
+        </div>
+        <div class="summary-item">
+            <strong>Total Amount</strong>
+            <strong>₹{{totalAmount}}</strong>
+        </div>
+        <div class="summary-item">
+            <strong>You will save ₹{{totalSavings}} on this order</strong>
+        </div>
+
+        <a href="/checkout" class="checkout-button">Checkout</a>
+
+    </div>
+    {{else}}
+    <div class="container mt-4">
+        <div class="alert alert-info custom-alert text-center" role="alert">
+            <img src="images/empty.jpg" class="_23xWM8">
+            <p class="mb-0">Your cart is empty.</p>
+        </div>
+    </div>
+    {{/if}}
+</div>
+
+
+
+<script>
+    const MIN_QUANTITY = 1;
+
+    function changeQuantity(button, change) {
+        const quantityInput = button.parentNode.querySelector('.quantity-input');
+        const currentQuantity = parseInt(quantityInput.value);
+        const productId = button.getAttribute('id');
+
+        // Calculate new quantity
+        let newQuantity = currentQuantity + change;
+
+        // Ensure new quantity is not below minimum
+        if (newQuantity < MIN_QUANTITY) {
+            newQuantity = MIN_QUANTITY;
+        }
+
+        // Update the quantity input box immediately
+        quantityInput.value = newQuantity;
+
+        // Update the backend only if the quantity is changed
+        if (newQuantity !== currentQuantity) {
+            // Proceed to update the cart with the new quantity
+            updateCartQuantity(productId, newQuantity, quantityInput, currentQuantity);
+        }
+    }
+
+    function updateCartQuantity(productId, quantity, quantityInput, oldQuantity) {
+        fetch('/updateCartQuantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ productId, quantity })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateCartUI(data)
+                    // Optionally, show a success message if you want to notify the user
+                } else {
+                    // If there was an issue (e.g., quantity exceeds available stock), show an alert
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Quantity Limit',
+                        text: data.message, // Show the error message from the server
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+
+                        // Revert the quantity to the previous valid value
+                        quantityInput.value = oldQuantity;
+
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error updating quantity:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'There was an error updating the quantity.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    quantityInput.value = oldQuantity;
+                });
+            });
+    }
+
+    function deleteItem(button) {
+        const cartItem = button.closest('.cart-item');
+        const productId = cartItem.getAttribute('data-product-id');
+
+        // Show confirmation dialog
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to remove this item from your cart?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, remove it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                cartItem.remove();
+
+                // Update the backend
+                removeCartItem(productId);
+            }
+        });
+    }
+
+    function removeCartItem(productId) {
+        fetch(`/removeCartItem/${productId}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Item Removed',
+                        text: 'The item has been successfully removed from your cart.',
+                        confirmButtonText: 'OK'
+                    });
+                    updateCartUI(data)
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Remove Failed',
+                        text: 'Failed to remove item from cart.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    ///after success update and delete the summery will change
+    function updateCartUI(data) {
+        const cartSummaryContainer = document.querySelector('.cart-summary');
+        if (!cartSummaryContainer) {
+            console.error('Cart summary container not found');
+            return;
+        }
+
+        // Update cart summary
+        cartSummaryContainer.innerHTML = `
+        <h4>Cart Summary</h4>
+        <div class="summary-item">
+            <span>Price (${data.totalItems} items)</span>
+            <span>₹${data.totalPrice.toFixed(2)}</span>
+        </div>
+        <div class="summary-item">
+            <span>Discount</span>
+            <span>− ₹${data.totalDiscount.toFixed(2)}</span>
+        </div>
+        <div class="summary-item">
+            <span>Delivery Charges</span>
+            <span>₹${data.deliveryCharges.toFixed(2)} Free</span>
+        </div>
+        <div class="summary-item">
+            <span>Secured Packaging Fee</span>
+            <span>₹${data.packagingFee.toFixed(2)}</span>
+        </div>
+        <div class="summary-item">
+            <strong>Total Amount</strong>
+            <strong>₹${data.totalAmount.toFixed(2)}</strong>
+        </div>
+        <div class="summary-item">
+            <strong>You will save ₹${data.totalSavings.toFixed(2)} on this order</strong>
+        </div>
+       <a href="/checkout" class="checkout-button">Checkout</a>
+    `;
+    }
+
+
+</script>
+
+
+
+</body>
+
+</html>

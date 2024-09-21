@@ -1,0 +1,450 @@
+<style>
+    <style>body {
+        background-color: #f4f7fa;
+        /* Light background for the whole page */
+        font-family: 'Arial', sans-serif;
+        /* Modern font */
+        color: #333;
+        /* Darker text color for better readability */
+    }
+
+    #sidebar {
+        width: 230px;
+        background-color: #ffffff;
+        /* White background for sidebar */
+        border-right: 1px solid #dee2e6;
+        /* Subtle border for separation */
+    }
+
+    .section {
+        margin-left: 0;
+        /* Adjust according to your layout */
+        padding: 20px;
+        /* Added padding for more space */
+        background-color: #ffffff;
+        /* White background for main section */
+        border-radius: 8px;
+        /* Rounded corners */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        /* Subtle shadow for depth */
+        overflow: auto;
+    }
+
+    .filter-controls {
+        margin-bottom: 20px;
+        padding: 10px;
+        /* Added padding for filter controls */
+        background-color: #e9ecef;
+        /* Light gray background for filters */
+        border-radius: 5px;
+        /* Rounded corners */
+    }
+
+    .filter-controls .btn {
+        margin-left: 5px;
+        border-radius: 5px;
+        /* Rounded button corners */
+    }
+
+    .filter-controls .form-control {
+        width: 150px;
+        /* Adjusted width for better fit */
+        border-radius: 5px;
+        /* Rounded input corners */
+        border: 1px solid #ced4da;
+        /* Subtle border */
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        /* Inset shadow */
+    }
+
+    .summary-cards {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        flex: 1;
+        min-width: 150px;
+        margin: 10px;
+        /* Increased margin for spacing */
+        padding: 20px;
+        /* More padding for content */
+        background-color: #ffffff;
+        /* White background */
+        border: 1px solid #dee2e6;
+        /* Border */
+        border-radius: 8px;
+        /* Rounded corners */
+        text-align: center;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+        /* Shadow effect */
+        transition: transform 0.2s;
+        /* Smooth scaling effect */
+    }
+
+    .summary-card:hover {
+        transform: translateY(-5px);
+        /* Lift effect on hover */
+    }
+
+    .summary-card h5 {
+        margin-bottom: 10px;
+        font-size: 20px;
+        /* Larger font for headings */
+        color: #007bff;
+        /* Blue color for headings */
+    }
+
+    .summary-card span {
+        font-size: 28px;
+        /* Larger font for values */
+        font-weight: bold;
+        color: #28a745;
+        /* Green color for numbers */
+    }
+
+    .card {
+        margin-top: 20px;
+        /* Margin for card */
+        border: none;
+        /* Remove card border */
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        /* Shadow for card */
+    }
+
+    .table {
+        overflow: auto;
+        margin-top: 10px;
+        /* Margin above the table */
+    }
+
+    th {
+        background-color: #007bff;
+        /* Blue background for headers */
+        color: #ffffff;
+        /* White text for headers */
+    }
+
+    tbody tr:hover {
+        background-color: #f1f1f1;
+        /* Light gray on row hover */
+    }
+
+    .sidebar-hidden .section {
+        margin-left: 0;
+        /* No margin when sidebar is hidden */
+    }
+
+    /* Add a class for when the sidebar is visible */
+    .sidebar-visible .section {
+        margin-left: 0px;
+        /* Adjust margin according to sidebar width */
+    }
+</style>
+
+</head>
+
+<body>
+    <!-- Admin Header -->
+    <!-- Sidebar -->
+
+    <!-- Main Content -->
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Sales Report</h1>
+        </div>
+
+        <section class="section">
+            <!-- Filter Controls -->
+            <div class="filter-controls">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-md-auto">
+                            <input type="date" id="startDate" class="form-control">
+                        </div>
+                        <div class="col-md-auto">
+                            <input type="date" id="endDate" class="form-control">
+                        </div>
+                        <div class="col-md-auto">
+                            <button id="applyDateRangeBtn" class="btn btn-secondary">Apply Date Range</button>
+                        </div>
+                        <div class="col-md-auto">
+                            <button id="monthBtn" class="btn btn-primary">Month</button>
+                            <button id="yearBtn" class="btn btn-primary">Year</button>
+                            <button id="weekBtn" class="btn btn-primary">Week</button>
+                        </div>
+                        <span id="rangeError" style="color:red"></span>
+
+                    </div>
+                </div>
+            </div>
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h5>Total Sales</h5>
+                    <span id="totalOrders">0</span>
+                </div>
+                <div class="summary-card">
+                    <h5>Total Customers</h5>
+                    <span id="totalCustomers">0</span>
+                </div>
+                <div class="summary-card">
+                    <h5>Online Payments</h5>
+                    <span id="onlinePayments">0</span>
+                </div>
+                <div class="summary-card">
+                    <h5>Cash on Delivery</h5>
+                    <span id="cashOnDelivery">0</span>
+                </div>
+                <div class="summary-card">
+                    <h5>Total Refunds</h5>
+                    <span id="totalRefunds">0</span>
+                </div>
+                <div class="summary-card">
+                    <h5>Total Discount</h5>
+                    <span id="totalDiscount">0</span>
+                </div>
+                <div class="summary-card">
+                    <h5>Total Shipping Charges</h5>
+                    <span id="totalShipping">0</span>
+                </div>
+                <div class="summary-card">
+                    <h5>Total Order Amount</h5>
+                    <span id="totalProfit">0</span>
+                </div>
+            </div>
+            <div class="row" style=" display: inline-block; 
+    overflow-x: auto;">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table datatable" id="salesReportTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Order ID</th>
+                                        <th scope="col">User</th>
+                                        <th scope="col">Products</th>
+                                        <th scope="col"> MRP</th>
+
+                                        <th scope="col">Tot MRP</th>
+                                        <th>Coupn Disc</th>
+                                        <th scope="col">Tot Offer</th>
+                                        <th scope="col">Tot Disc</th>
+                                        <th scope="col">Tot Price</th>
+                                        <th scope="col">Status</th>
+
+                                        <th scope="col">Payment Method</th>
+                                        <th scope="col">Date</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rows will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main><!-- End Main Content -->
+
+    <!-- Include Bootstrap JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function fetchSalesReport(filters = {}) {
+            if (Object.keys(filters).length === 0) {
+                const { startDate, endDate } = getDateRangeForMonth();
+                filters = { startDate, endDate };
+            }
+
+            let url = '/admin/salesReport';
+            const queryParams = new URLSearchParams(filters).toString();
+            if (queryParams) {
+                url += `?${queryParams}`;
+            }
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.report) {
+                        // Update the totals in the view
+                        document.getElementById('totalOrders').textContent = data.report.totalOrders;
+                        document.getElementById('totalCustomers').textContent = data.report.totalCustomers;
+                        document.getElementById('onlinePayments').textContent = data.report.onlinePayment;
+                        document.getElementById('cashOnDelivery').textContent = data.report.cashOnDelivery;
+                        document.getElementById('totalRefunds').textContent = data.report.totalRefund;
+                        document.getElementById('totalDiscount').textContent = data.report.totalDiscount;
+                        document.getElementById('totalShipping').textContent = data.report.totalShippingCharges;
+                        document.getElementById('totalProfit').textContent = data.report.totalOrderedAmount;
+                    }
+
+                    const tableBody = document.querySelector('#salesReportTable tbody');
+                    tableBody.innerHTML = ''; // Clear existing rows
+                    data.orders.forEach(order => {
+
+                        const row = document.createElement('tr');
+                        if (order && order.orderedProducts) {
+                            const orderedProducts = order.orderedProducts || {};
+
+                            // Check if orderedProducts is an object
+                            const product = typeof orderedProducts === 'object' ? orderedProducts : {};
+
+                            const productName = `${product.productName} (x${product.quantity})`;
+                            console.log(orderedProducts);
+
+                            row.innerHTML = `
+                    <td>${order.orderId}</td>
+                    <td>${order.users?.username || 'N/A'}</td>
+                    <td>${productName}</td>
+                     <td>${product.price}</td>
+
+                      <td>${product.itemTotalPrice || 'N/A'}</td>
+                         <td>${product.productDiscount || 'N/A'}</td>
+                      
+                                          <td>${product.totProdOffer}</td>
+                     <td>${product.totProdDisc}</td>
+
+                     
+                     <td>${product.offerPrice}</td>
+                     <td>${product.orderStatus}</td>                                  
+
+
+                    <td>${order.paymentMethod || 'N/A'}</td>
+                    <td>${new Date(order.createdAt).toLocaleDateString()}</td>
+                `;
+                            console.log(orderedProducts);
+                            tableBody.appendChild(row);
+                        }
+                    });
+
+
+                })
+                .catch(error => console.error('Error fetching sales report:', error));
+        }
+
+
+        function getDateRangeForMonth() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), 1);
+            const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] };
+        }
+
+        function getDateRangeForWeek() {
+            const end = new Date(); // Today
+            const start = new Date();
+            start.setDate(end.getDate() - 7); // 7 days before today
+
+            return {
+                startDate: start.toISOString().split('T')[0],
+                endDate: end.toISOString().split('T')[0]
+            };
+        }
+
+        function getDateRangeForYear() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 1);
+            const end = new Date(now.getFullYear(), 11, 31);
+            return { startDate: start.toISOString().split('T')[0], endDate: end.toISOString().split('T')[0] };
+        }
+        function updateDatePickers() {
+            const today = new Date().toISOString().split('T')[0];
+            const startDatePicker = document.getElementById('startDate');
+            const endDatePicker = document.getElementById('endDate');
+
+            startDatePicker.setAttribute('max', today);
+            //    endDatePicker.setAttribute('max', today);
+
+            // Set end date min attribute to be the same as start date
+            startDatePicker.addEventListener('change', () => {
+                const startDate = new Date(startDatePicker.value);
+                if (startDate > new Date(endDatePicker.value)) {
+                    endDatePicker.value = startDatePicker.value;
+                }
+                if (startDate > new Date(today)) {
+                    //   alert('Start date cannot be in the future.');
+                    // startDatePicker.value = today; // Set start date to today
+                }
+                endDatePicker.setAttribute('min', startDatePicker.value);
+            });
+
+            endDatePicker.addEventListener('change', () => {
+                const endDate = new Date(endDatePicker.value);
+                if (endDate < new Date(startDatePicker.value)) {
+                    endDatePicker.value = startDatePicker.value;
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDatePickers();
+
+            // Default to current month's report
+            const { startDate, endDate } = getDateRangeForMonth();
+            fetchSalesReport({ startDate, endDate });
+
+            document.getElementById('applyDateRangeBtn').addEventListener('click', () => {
+                const today = new Date().toISOString().split('T')[0];
+                const rangeError = document.getElementById('rangeError');
+                document.getElementById('rangeError').textContent = ''
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                if (startDate && endDate) {
+                    if (new Date(startDate) > new Date(today)) {
+                        rangeError.textContent = 'Start date cannot be in the future.';
+                    } else if (endDate > new Date(today)) {
+                        rangeError.textContent = 'End date cannot be in the future.';
+                    } else if (endDate < startDate) {
+                        rangeError.textContent = 'End date must be greater than or equal to the start date.';
+                    } else {
+                        fetchSalesReport({ startDate, endDate });
+                    }
+                } else if (!startDate || !endDate) {
+                    rangeError.textContent = 'Please select both start and end dates.';
+                }
+            });
+
+            document.getElementById('monthBtn').addEventListener('click', () => {
+                const { startDate, endDate } = getDateRangeForMonth();
+                fetchSalesReport({ startDate, endDate });
+            });
+
+            document.getElementById('yearBtn').addEventListener('click', () => {
+                const { startDate, endDate } = getDateRangeForYear();
+                fetchSalesReport({ startDate, endDate });
+            });
+
+            document.getElementById('weekBtn').addEventListener('click', () => {
+                const { startDate, endDate } = getDateRangeForWeek();
+                fetchSalesReport({ startDate, endDate });
+            });
+        });
+        document.getElementById('startDate').addEventListener('change', () => {
+            const startDate = document.getElementById('startDate').value;
+            if (startDate) {
+                document.getElementById('endDate').value = '';
+                document.getElementById('endDate').setAttribute('min', startDate);
+            }
+        });
+
+        // Restrict end date selection based on the start date
+        document.getElementById('endDate').addEventListener('change', () => {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (startDate && endDate && endDate < startDate) {
+                document.getElementById('rangeError').textContent = 'End date must be later than or equal to start date.';
+                document.getElementById('endDate').value = '';
+            } else {
+                document.getElementById('rangeError').textContent = '';
+            }
+        });
+    </script>
+</body>
+
+</html>

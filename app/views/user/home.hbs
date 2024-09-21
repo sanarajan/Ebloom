@@ -1,0 +1,63 @@
+<!-- Banner -->
+<div class="banner-image"></div>
+
+<!-- Main Content -->
+<div class="container my-5">
+  <div class="text-center mb-4">
+    <h1 class="section-heading">Welcome to EBloom - Your Online Plant Nursery<br> Bringing nature closer to You.</h1>
+    <p class="description">At E-Bloom, we believe in the power of plants to transform spaces and uplift spirits.Whether
+      you're a seasoned gardener or<br> just starting out, we have something special for everyone.</p>
+  </div>
+
+  <!-- Our Collection -->
+  <h2 class="section-heading mt-5">Our Collection</h2>
+  <div class="our-collection">
+    <!-- Repeat this block for each section -->
+    <div class="collection-item">
+      <h3>Flowering Plants</h3>
+      <p>Brighten up your garden or home with our vibrant.</p>
+    </div>
+    <div class="collection-item">
+      <h3>Outdoor Plants</h3>
+      <p>Create a lush, green oasis in your backyard with our outdoor plants.</p>
+    </div>
+    <div class="collection-item">
+      <h3>Succulents & Cacti</h3>
+      <p>Discover the charm of low-maintenance, drought-resistant plants</p>
+    </div>
+    <div class="collection-item">
+      <h3>Indoor Plant</h3>
+      <p>Discover the charm of low-maintenance, drought-resistant plants</p>
+    </div>
+  </div>
+
+  <!-- New Arrivals -->
+  <h2 class="section-heading mt-5">New Arrivals</h2>
+  <div class="row">
+    {{#each homeProducts}}
+    <div class="col-md-3 col-sm-6 mb-4">
+      <a href="/productDetails/{{this._id}}" class="text-decoration-none" style="cursor:pointer">
+
+        <div class="card position-relative">
+          <img src="{{this.thumbnailPaths.[0]}}" class="card-img-top" alt="{{this.productName}}">
+          <div class="icon-top-left">
+            <a href="/" class="btn btn-primary btn-icon"><i class="fa fa-shopping-cart"></i></a>
+          </div>
+          <div class="icon-wishlist">
+            <a href="/" class="btn btn-outline-secondary btn-icon"><i class="fa fa-heart"></i></a>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">{{this.productName}}</h5>
+            <p class="card-text">{{this.price}} Rs</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    {{/each}}
+  </div>
+  <div class="text-center mt-4">
+    <a href="/" class="btn btn-primary">View All</a>
+  </div>
+</div>
+
+<!-- Footer -->

@@ -1,0 +1,132 @@
+<main id="main" class="main">
+
+  <div class="pagetitle">
+    <h1>Coupons</h1>
+    <nav>
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+        <li class="breadcrumb-item">Tables</li>
+        <li class="breadcrumb-item active">Data</li>
+      </ol>
+    </nav>
+    {{#if success}}
+    <div class="alert alert-success"> {{success}}</div>
+    {{/if}}
+    {{#if coupnAdd}}
+    <div class="alert alert-success"> {{coupnAdd}}</div>
+    {{/if}}
+  {{#if couponUpdat}}
+    <div class="alert alert-success"> {{couponUpdat}}</div>
+    {{/if}}
+
+    
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Coupons</h5>
+
+            <!-- Table with stripped rows -->
+            <table class="table datatable">
+              <thead>
+                <tr>
+                   <th>Image</th>
+                  <th>Name</th>
+                   <th>Disc Type</th>
+                  <th>Disc Percent</th>
+                   <th>Disc Amt</th>
+                      <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#if coupons}}
+                {{#each coupons}}
+                <tr>
+                   <td><img src="/{{this.couponImage}}" style="height:50px;width:50px"></td>
+                  <td>{{this.couponName}}</td>
+                    <td>{{this.discountType}}</td>
+                      <td>{{this.discountPercentage}}</td>
+                          <td>{{this.discountValue}}</td>
+                            <td id="status{{_id}}"> <button class="btn {{ternary (eq this.status true) 'btn-success' 'btn-danger'}}"
+                      onclick="toggleStatus('{{this._id}}')">
+                      {{ternary (eq this.status true) 'Active' 'Inactive'}}
+                    </button></td>
+               
+                  <td> 
+                    <span><a href="/admin/editCoupon/{{this._id}}"><i class="bi bi-pencil-square"></i></a></span>
+                  </td>
+                </tr>
+                {{/each}}
+                {{/if}}
+              </tbody>
+            </table>
+            <!-- End Table with stripped rows -->
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main><!-- End #main -->
+
+<script>
+  function toggleStatus(couponId) {
+    const statusButton = document.querySelector(`#status${couponId} button`);
+    let md = false;
+    let txt = 'Active'
+    if (statusButton.innerText === 'Active') {
+      md = true;
+      txt = 'Inactive'
+    }
+
+    swal({
+      title: "Are you sure?",
+      text: `Do you want to ${txt} the coupon?`,
+      icon: "warning",
+      buttons: true,
+      dangerMode: md,
+    })
+      .then((willChange) => {
+        if (willChange) {
+          fetch('/admin/changeCouponStatus', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: couponId })
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+
+                if (data.newStatus === 'Active') {
+                  statusButton.classList.remove('btn-danger');
+                  statusButton.classList.add('btn-success');
+                  statusButton.textContent = 'Active';
+                } else {
+
+                  statusButton.classList.remove('btn-success');
+                  statusButton.classList.add('btn-danger');
+                  statusButton.textContent = 'Inactive';
+                }
+                swal("Success!", "The coupon status has been updated.", "success");
+              } else {
+                console.error('Error updating coupon status:', data.message);
+                swal("Error", 'Error updating coupon status: ' + data.message, "error");
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              swal("Error", "An error occurred while updating the coupon status.", "error");
+            });
+        }
+      });
+  }
+
+</script>
