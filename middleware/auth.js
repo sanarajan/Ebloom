@@ -4,7 +4,6 @@ function isAdminAuthenticated(req, res, next) {
     } else {
         res.redirect('/admin');
     }
-  }
-  
+  }  
   module.exports = isAdminAuthenticated;
   

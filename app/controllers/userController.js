@@ -373,7 +373,6 @@ exports.editName = async (req, res) => {
         .status(404)
         .json({ success: false, message: "User not found." });
     }
-
     // Update the user's name
     user.username = `${firstName} ${lastName}`;
     await user.save();

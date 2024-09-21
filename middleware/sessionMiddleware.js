@@ -5,7 +5,6 @@ function sessionMiddleware(req, res, next) {
     res.locals.isAuthenticated = !!req.session.useremail;
     
     next();
-  }
-  
+  }  
   module.exports = sessionMiddleware;
   

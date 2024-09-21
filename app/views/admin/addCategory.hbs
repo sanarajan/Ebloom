@@ -1,5 +1,4 @@
 <main id="main" class="main">
-
   <div class="pagetitle">
     <h1>Add Category</h1>
     <nav>
@@ -17,11 +16,11 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title"></h5>
-                
-                        {{#if errorMessage}}
-                        <div class="alert alert-danger"> {{errorMessage}}</div>
 
-                        {{/if}}
+            {{#if errorMessage}}
+            <div class="alert alert-danger"> {{errorMessage}}</div>
+
+            {{/if}}
             <!-- Horizontal Form -->
             <form id="categoryForm" action="/admin/addCategory" method="post">
               <div class="row mb-3">

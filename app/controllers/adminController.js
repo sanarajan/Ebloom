@@ -116,7 +116,6 @@ exports.fetchDashboard = async (req, res) => {
         createdAt: dateFilter, 
         paymentStatus: { $ne: 'Failed' } 
       };
-
       // Total Sales and Revenue
       const totalSales = await Order.countDocuments(commonFilter);
       const totalRevenueResult = await Order.aggregate([
