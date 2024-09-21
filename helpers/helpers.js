@@ -21,7 +21,6 @@ handlebars.registerHelper("eq", function (arg1, arg2) {
     ) {
       return false;
     }
-
     // Convert both arguments to strings for comparison
     return arg1.toString() === arg2.toString();
   } // Ensure comparison as strings to handle ObjectId comparison

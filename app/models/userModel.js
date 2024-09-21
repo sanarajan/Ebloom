@@ -16,7 +16,6 @@ const userSchema = new mongoose.Schema({
   address_ids: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Address' }] ,// Array of address references
   referralId:{ type: String, unique: true }
 });
-
 // Hash password before saving
 userSchema.pre('save', function(next) {
   if (!this.isModified('password')) return next();

@@ -84,7 +84,6 @@ router.post('/updatePassword',isUserAuthenticated,userController.updatePassword)
 
 
 
-
 //cart and product
 router.post('/addToCart',isUserAuthenticated, cartController.addToCart);
 router.get('/yourCart',isUserAuthenticated,cartController.yourCart);

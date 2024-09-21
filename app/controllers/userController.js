@@ -3,7 +3,6 @@ const Product = require("../models/productModel");
 const Address = require("../models/addressModel");
 const userOTPVerification = require("../models/userOTPVerification");
 const Wallet = require("../models/walletModel");
-
 const { sendOTPEmail } = require("../../utils/otpEmail");
 const bcrypt = require("bcryptjs"); //password hashing
 const crypto = require("crypto"); //for otp generating
