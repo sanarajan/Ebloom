@@ -403,7 +403,6 @@ exports.editPhoneNumber = async (req, res) => {
         message: "Phone number must be 10 digits long.",
       });
     }
-
     // Assuming user is authenticated and user ID is in the session
 
     const user = await userModel.findById(userId);

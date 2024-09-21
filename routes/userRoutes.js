@@ -68,8 +68,7 @@ router.get( '/auth/google/success',isLoggedIn,
  });
  router.get( '/auth/google/failure',
   (req,res)=>{
-   res.send("some error found")
- 
+   res.send("some error found") 
   });
 //end for google auth /single signon
 router.get('/profile',isUserAuthenticated,userController.profile);
