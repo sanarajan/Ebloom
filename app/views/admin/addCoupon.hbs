@@ -162,7 +162,6 @@
     const today = new Date().toISOString().split('T')[0];
     const startDatePicker = document.getElementById('startDate');
     startDatePicker.setAttribute('min', today);
-
     // Prevent negative numbers from being entered
     const numberInputs = document.querySelectorAll('input[type="number"]');
     numberInputs.forEach(function (input) {

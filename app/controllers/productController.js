@@ -475,7 +475,6 @@ exports.shopFetch = async (req, res) => {
       if (!isNaN(minPriceNumber)) productQuery.price.$gte = minPriceNumber;
       if (!isNaN(maxPriceNumber)) productQuery.price.$lte = maxPriceNumber;
     }
-
     // Apply new arrivals filter
     if (newArrivals === 'true') {
       const oneMonthAgo = new Date();
