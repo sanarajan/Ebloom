@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const User = require('../app/models/userModel'); // Adjust the path if necessary
@@ -33,7 +32,6 @@ async function(request, accessToken, refreshToken, profile, done) {
     return done(err, null);
   }
 }));
-
 passport.serializeUser((user, done) => {
   done(null, user.id); // Ensure the ID is a string
 });
