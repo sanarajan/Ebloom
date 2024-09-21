@@ -15,7 +15,6 @@ const flash = require("connect-flash");
 const mongoose = require("./config/database");
 const sessionMiddleware = require("./middleware/sessionMiddleware"); // For session check in view
 // const setUploadFolder = require('../middlewares/setUploadFolder');
-
 const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const helpers = require("./helpers/helpers");

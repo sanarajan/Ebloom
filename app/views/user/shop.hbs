@@ -171,12 +171,14 @@
     justify-content: flex-end;
     margin-top: 20px;
   }
+
   #search {
     border: 1px solid #007bff;
     border-radius: 5px;
     padding: 10px;
-    width: 100%; /* Full width of the container */
-}
+    width: 100%;
+    /* Full width of the container */
+  }
 </style>
 
 
@@ -188,12 +190,12 @@
       <div class="row mb-3">
         <div class="col">
           <input type="number" class="form-control" placeholder="Min" id="price-min">
-           <small id="min-error" class="text-danger"></small>
+          <small id="min-error" class="text-danger"></small>
 
         </div>
         <div class="col">
           <input type="number" class="form-control" placeholder="Max" id="price-max">
-           <small id="max-error" class="text-danger"></small>
+          <small id="max-error" class="text-danger"></small>
         </div>
       </div>
       <div class="filters">
@@ -246,7 +248,8 @@
           </select>
         </div>
         <div>
-          <input type="search" id="search" class="form-control" onkeyup="fetchProductsAndPagination(1)" placeholder="Search products">
+          <input type="search" id="search" class="form-control" onkeyup="fetchProductsAndPagination(1)"
+            placeholder="Search products">
         </div>
       </div>
       <div class="row" id="product-list">
@@ -280,12 +283,12 @@
     //check min and max valid
     document.getElementById('price-min').addEventListener('input', validatePrice);
     document.getElementById('price-max').addEventListener('input', validatePrice);
-   // document.getElementById('price-max').addEventListener('focusout', checkPriceRange);
+    // document.getElementById('price-max').addEventListener('focusout', checkPriceRange);
 
     // Apply filters
     document.getElementById('sort-by').addEventListener('change', applyFilters);
-  //  document.getElementById('price-min').addEventListener('input', applyFilters);
-   // document.getElementById('price-max').addEventListener('input', applyFilters);
+    //  document.getElementById('price-min').addEventListener('input', applyFilters);
+    // document.getElementById('price-max').addEventListener('input', applyFilters);
     document.getElementById('new-arrivals').addEventListener('change', applyFilters);
 
     document.querySelectorAll('.subcategory-checkbox').forEach(checkbox => {
@@ -337,8 +340,8 @@
     const minPrice = document.getElementById('price-min').value || null;
     const maxPrice = document.getElementById('price-max').value || null;
     const newArrivals = document.getElementById('new-arrivals').checked ? 'true' : 'false';
-    const searchTerm =  document.getElementById('search').value;
-    console.log(searchTerm+" search")
+    const searchTerm = document.getElementById('search').value;
+    console.log(searchTerm + " search")
     // Get selected categories and subcategories
     const selectedCategories = Array.from(document.querySelectorAll('.category-checkbox:checked')).map(cb => cb.value);
     const selectedSubcategories = Array.from(document.querySelectorAll('.subcategory-checkbox:checked')).map(cb => cb.value);
@@ -461,57 +464,56 @@
 
 
 
-//keyup min and max
-function validatePrice(event) {
-  event.target.value = event.target.value.replace(/[^0-9]/g, '');
-  const minPriceInput = document.getElementById('price-min');
-  const maxPriceInput = document.getElementById('price-max');
-  const minError = document.getElementById('min-error');
-  const maxError = document.getElementById('max-error');
+  //keyup min and max
+  function validatePrice(event) {
+    event.target.value = event.target.value.replace(/[^0-9]/g, '');
+    const minPriceInput = document.getElementById('price-min');
+    const maxPriceInput = document.getElementById('price-max');
+    const minError = document.getElementById('min-error');
+    const maxError = document.getElementById('max-error');
 
-  minError.textContent = '';
-  maxError.textContent = '';
+    minError.textContent = '';
+    maxError.textContent = '';
 
-  const minPrice = parseFloat(minPriceInput.value);
-  const maxPrice = parseFloat(maxPriceInput.value);
+    const minPrice = parseFloat(minPriceInput.value);
+    const maxPrice = parseFloat(maxPriceInput.value);
 
-  if (minPrice < 0) {
-    minError.textContent = 'Min price cannot be negative.';
-    minPriceInput.value = '';  // Optionally, clear the invalid value
-  }
-  
-  if (maxPrice < 0) {
-    maxError.textContent = 'Max price cannot be negative.';
-    maxPriceInput.value = '';  // Optionally, clear the invalid value
-  }
+    if (minPrice < 0) {
+      minError.textContent = 'Min price cannot be negative.';
+      minPriceInput.value = '';  // Optionally, clear the invalid value
+    }
 
-  if (!isNaN(minPrice) && !isNaN(maxPrice) && maxPrice < minPrice) {
-   maxError.textContent = 'Enter valid price.';
-  }else{
-  applyFilters()
-  }
-}
-
-//focusout max price
-function checkPriceRange(){
-  const minPriceInput = document.getElementById('price-min');
-  const maxPriceInput = document.getElementById('price-max');
-  const minError = document.getElementById('min-error');
-  const maxError = document.getElementById('max-error');
-
-  // Clear previous errors
-  minError.textContent = '';
-  maxError.textContent = '';
-
-  const minPrice = parseFloat(minPriceInput.value);
-  const maxPrice = parseFloat(maxPriceInput.value);
-   if (!isNaN(minPrice) && !isNaN(maxPrice) && maxPrice < minPrice) {
-    maxError.textContent = 'Enter valid price range.';
-  }else{
-  applyFilters()
+    if (maxPrice < 0) {
+      maxError.textContent = 'Max price cannot be negative.';
+      maxPriceInput.value = '';  // Optionally, clear the invalid value
+    }
+    if (!isNaN(minPrice) && !isNaN(maxPrice) && maxPrice < minPrice) {
+      maxError.textContent = 'Enter valid price.';
+    } else {
+      applyFilters()
+    }
   }
 
-}
+  //focusout max price
+  function checkPriceRange() {
+    const minPriceInput = document.getElementById('price-min');
+    const maxPriceInput = document.getElementById('price-max');
+    const minError = document.getElementById('min-error');
+    const maxError = document.getElementById('max-error');
+
+    // Clear previous errors
+    minError.textContent = '';
+    maxError.textContent = '';
+
+    const minPrice = parseFloat(minPriceInput.value);
+    const maxPrice = parseFloat(maxPriceInput.value);
+    if (!isNaN(minPrice) && !isNaN(maxPrice) && maxPrice < minPrice) {
+      maxError.textContent = 'Enter valid price range.';
+    } else {
+      applyFilters()
+    }
+
+  }
 
 
 
