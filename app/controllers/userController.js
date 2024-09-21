@@ -386,7 +386,6 @@ exports.editName = async (req, res) => {
     });
   }
 };
-
 exports.editPhoneNumber = async (req, res) => {
   try {
     console.log("hfg");

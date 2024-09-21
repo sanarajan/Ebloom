@@ -72,7 +72,6 @@ router.get( '/auth/google/success',isLoggedIn,
  
   });
 //end for google auth /single signon
-
 router.get('/profile',isUserAuthenticated,userController.profile);
 router.post('/editName',isUserAuthenticated,userController.editName);
 router.post('/editPhoneNumber',isUserAuthenticated,userController.editPhoneNumber);

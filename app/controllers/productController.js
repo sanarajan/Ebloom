@@ -482,7 +482,6 @@ exports.shopFetch = async (req, res) => {
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
       productQuery.createdAt = { $gte: oneMonthAgo };
     }
-
     // Apply category filter
     if (category) {
       const categoriesArray = category.split(',');

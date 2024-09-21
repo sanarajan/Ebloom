@@ -9,5 +9,4 @@ function isUserAuthenticated(req, res, next) {
     res.redirect("/");
   }
 }
-
 module.exports = isUserAuthenticated;
