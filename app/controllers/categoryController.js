@@ -126,7 +126,6 @@ exports.editCategory = async (req, res) => {
     res.status(500).send("Internal server error");
   }
 };
-
   exports.updateCategory = async (req, res) => {
     try {
       const { _id, categoryName, description, isActive } = req.body;

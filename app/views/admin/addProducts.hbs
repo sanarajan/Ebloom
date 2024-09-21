@@ -1,5 +1,4 @@
 <main id="main" class="main">
-
   <div class="pagetitle">
     <h1> Products</h1>
     <nav>
@@ -114,64 +113,64 @@
                     style="display: none; max-width: 50px; max-height: 50px; border: 1px solid #ddd;" />
                 </div>
                 <div class="col-sm-12 text-center mt-2">
-                <span id="image1_error" class="col-sm-1" style="color: red;margin-right:10rem"></span>
+                  <span id="image1_error" class="col-sm-1" style="color: red;margin-right:10rem"></span>
+                </div>
               </div>
+
+
+              <div class="row mb-3">
+                <label for="image2" class="col-sm-3 col-form-label">Image 2</label>
+                <div class="col-sm-4 d-flex align-items-center">
+                  <input type="file" name="images" id="image2" class="form-control me-2" accept="image/*">
+                </div>
+                <div class="col-sm-5 d-flex align-items-center justify-content-start">
+                  <img id="image2_preview"
+                    style="display: none; max-width: 50px; max-height: 50px; border: 1px solid #ddd;" />
+                </div>
+                <div class="col-sm-12 text-center mt-2">
+                  <span id="image2_error" style="color: red;margin-right:10rem"></span>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <label for="image3" class="col-sm-3 col-form-label">Image 3</label>
+                <div class="col-sm-4 d-flex align-items-center">
+                  <input type="file" name="images" id="image3" class="form-control me-2" accept="image/*">
+                </div>
+                <div class="col-sm-5 d-flex align-items-center justify-content-start">
+                  <img id="image3_preview"
+                    style="display: none; max-width: 50px; max-height: 50px; border: 1px solid #ddd;" />
+                </div>
+                <div class="col-sm-12 text-center mt-2">
+                  <div id="image3_error" style="color: red;margin-right:10rem"></div>
+                </div>
+              </div>
+
+
+              <div class="row mb-3">
+                <label for="image4" class="col-sm-3 col-form-label">Image 4</label>
+                <div class="col-sm-4 d-flex align-items-center">
+                  <input type="file" name="images" id="image4" class="form-control me-2" accept="image/*">
+                </div>
+                <div class="col-sm-5 d-flex align-items-center justify-content-start">
+                  <img id="image4_preview"
+                    style="display: none; max-width: 50px; max-height: 50px; border: 1px solid #ddd;" />
+                </div>
+                <div class="col-sm-12 text-center mt-2">
+                  <div id="image4_error" style="color: red;margin-right:10rem"></div>
+                </div>
+              </div>
+
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </form>
+
+            <!-- End Horizontal Form -->
+
           </div>
-
-  
-          <div class="row mb-3">
-            <label for="image2" class="col-sm-3 col-form-label">Image 2</label>
-            <div class="col-sm-4 d-flex align-items-center">
-              <input type="file" name="images" id="image2" class="form-control me-2" accept="image/*">
-            </div>
-            <div class="col-sm-5 d-flex align-items-center justify-content-start">
-              <img id="image2_preview"
-                style="display: none; max-width: 50px; max-height: 50px; border: 1px solid #ddd;" />
-            </div>
-            <div class="col-sm-12 text-center mt-2">
-              <span id="image2_error" style="color: red;margin-right:10rem"></span>
-            </div>
-          </div>
-
-          <div class="row mb-3">
-            <label for="image3" class="col-sm-3 col-form-label">Image 3</label>
-            <div class="col-sm-4 d-flex align-items-center">
-              <input type="file" name="images" id="image3" class="form-control me-2" accept="image/*">
-            </div>
-            <div class="col-sm-5 d-flex align-items-center justify-content-start">
-              <img id="image3_preview"
-                style="display: none; max-width: 50px; max-height: 50px; border: 1px solid #ddd;" />
-            </div>
-            <div class="col-sm-12 text-center mt-2">
-              <div id="image3_error" style="color: red;margin-right:10rem"></div>
-            </div>
-          </div>
-
-
-          <div class="row mb-3">
-            <label for="image4" class="col-sm-3 col-form-label">Image 4</label>
-            <div class="col-sm-4 d-flex align-items-center">
-              <input type="file" name="images" id="image4" class="form-control me-2" accept="image/*">
-            </div>
-            <div class="col-sm-5 d-flex align-items-center justify-content-start">
-              <img id="image4_preview"
-                style="display: none; max-width: 50px; max-height: 50px; border: 1px solid #ddd;" />
-            </div>
-            <div class="col-sm-12 text-center mt-2">
-              <div id="image4_error" style="color: red;margin-right:10rem"></div>
-            </div>
-          </div>
-
-          <div class="text-center">
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </div>
-          </form>
-
-          <!-- End Horizontal Form -->
-
         </div>
       </div>
-    </div>
     </div>
   </section>
 
@@ -179,15 +178,15 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     function validateDecimalInput(value) {
-    // Regex for validating decimal numbers with up to 2 decimal places
-    const decimalRegex = /^\d*(\.\d{0,2})?$/;
-    return decimalRegex.test(value);
-  }
+      // Regex for validating decimal numbers with up to 2 decimal places
+      const decimalRegex = /^\d*(\.\d{0,2})?$/;
+      return decimalRegex.test(value);
+    }
 
-  function formatDecimalInput(value) {
-    // Format the value to 2 decimal places
-    return parseFloat(value).toFixed(2);
-  }
+    function formatDecimalInput(value) {
+      // Format the value to 2 decimal places
+      return parseFloat(value).toFixed(2);
+    }
 
     function productValidation(event) {
       const productName = document.getElementById('productName').value.trim();
@@ -249,36 +248,37 @@
       if (!price) {
         price_error.textContent = "Field  Required";
         valid = false;
-      }else if (!validateDecimalInput(price)) {
-      price_error.textContent = "Price must be a decimal number with up to 2 decimal places";
-      valid = false;
-    }
+      } else if (!validateDecimalInput(price)) {
+        price_error.textContent = "Price must be a decimal number with up to 2 decimal places";
+        valid = false;
+      }
       if (!quantity) {
         quantity_error.textContent = "Field  Required";
         valid = false;
-      }else if (!validateDecimalInput(quantity)) {
-      quantity_error.textContent = "Quantity must be a decimal number with up to 2 decimal places";
-      valid = false;
-    }
+      } else if (!validateDecimalInput(quantity)) {
+        quantity_error.textContent = "Quantity must be a decimal number with up to 2 decimal places";
+        valid = false;
+      }
       if (!image1) {
         image1_error.textContent = "Field Required";
         valid = false;
       } else if (!image1.type.startsWith('image/')) {
         image1_error.textContent = "File must be an image";
         valid = false;
-      }else {
-           
-        
+      } else {
+
+
         if (image1) {
           // Allowed file types
           const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-          
-          if (!allowedTypes.includes(image1.type)) {alert("hfg")
+
+          if (!allowedTypes.includes(image1.type)) {
+            alert("hfg")
             image1_error.textContent = 'Not valid image';
-             valid = false;
+            valid = false;
           } else if (image1.size > 5 * 1024 * 1024) {
             image1_error.textContent = 'File size exceeds 5MB!';
-             valid = false;// Prevent form submission
+            valid = false;// Prevent form submission
           }
         }
       }
@@ -288,19 +288,20 @@
       } else if (!image2.type.startsWith('image/')) {
         image2_error.textContent = "File must be an image";
         valid = false;
-      }else {
-           
-        
+      } else {
+
+
         if (image2) {
           // Allowed file types
           const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-          
-          if (!allowedTypes.includes(image2.type)) {alert("hfg")
+
+          if (!allowedTypes.includes(image2.type)) {
+            alert("hfg")
             image2_error.textContent = 'Not valid image';
-             valid = false;
+            valid = false;
           } else if (image2.size > 5 * 1024 * 1024) {
             image2_error.textContent = 'File size exceeds 5MB!';
-             valid = false;// Prevent form submission
+            valid = false;// Prevent form submission
           }
         }
       }
@@ -310,19 +311,20 @@
       } else if (!image3.type.startsWith('image/')) {
         image3_error.textContent = "File must be an image";
         valid = false;
-      }else {
-           
-        
+      } else {
+
+
         if (image3) {
           // Allowed file types
           const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-          
-          if (!allowedTypes.includes(image3.type)) {alert("hfg")
+
+          if (!allowedTypes.includes(image3.type)) {
+            alert("hfg")
             image3_error.textContent = 'Not valid image';
-             valid = false;
+            valid = false;
           } else if (image3.size > 5 * 1024 * 1024) {
             image3_error.textContent = 'File size exceeds 5MB!';
-             valid = false;// Prevent form submission
+            valid = false;// Prevent form submission
           }
         }
       }
@@ -332,19 +334,19 @@
       } else if (!image4.type.startsWith('image/')) {
         image4_error.textContent = "File must be an image";
         valid = false;
-      }else {
-           
-        
+      } else {
+
+
         if (image4) {
           // Allowed file types
           const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-          
+
           if (!allowedTypes.includes(image4.type)) {
             image4_error.textContent = 'Not valid image';
-             valid = false;
+            valid = false;
           } else if (image4.size > 5 * 1024 * 1024) {
             image4_error.textContent = 'File size exceeds 5MB!';
-             valid = false;// Prevent form submission
+            valid = false;// Prevent form submission
           }
         }
       }
@@ -358,7 +360,7 @@
   });
 
 
- function clearErrorOnInput(event) {
+  function clearErrorOnInput(event) {
     const target = event.target;
     const errorElement = document.getElementById(`${target.id}_error`);
     if (errorElement) {
@@ -398,77 +400,77 @@
   });
 
   // Attach form validation on submit
-  
+
 
   // category subcategory selection
-document.addEventListener('DOMContentLoaded', function() {
-  const categorySelect = document.getElementById('categoryId');
-  const subCategorySelect = document.getElementById('subCategoryId');
+  document.addEventListener('DOMContentLoaded', function () {
+    const categorySelect = document.getElementById('categoryId');
+    const subCategorySelect = document.getElementById('subCategoryId');
 
-  categorySelect.addEventListener('change', function() {
-    const selectedCategory = categorySelect.value;
+    categorySelect.addEventListener('change', function () {
+      const selectedCategory = categorySelect.value;
 
-    // Clear the subcategory dropdown
-    subCategorySelect.innerHTML = '<option value="">--Select--</option>';
+      // Clear the subcategory dropdown
+      subCategorySelect.innerHTML = '<option value="">--Select--</option>';
 
-    if (selectedCategory) {
-      fetch(`/admin/selectSubcategories?categoryId=${selectedCategory}`, { // Use selectedCategory here
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        // Populate the subcategory dropdown with the fetched data
-        if (data.subcategories && data.subcategories.length > 0) {
-          data.subcategories.forEach(subcategory => {
-            const option = document.createElement('option');
-            option.value = subcategory._id; // Assuming subcategory has _id property
-           
-            option.textContent = subcategory.subCategoryName; // Assuming subcategory has name property
-            subCategorySelect.appendChild(option);
+      if (selectedCategory) {
+        fetch(`/admin/selectSubcategories?categoryId=${selectedCategory}`, { // Use selectedCategory here
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(response => response.json())
+          .then(data => {
+            // Populate the subcategory dropdown with the fetched data
+            if (data.subcategories && data.subcategories.length > 0) {
+              data.subcategories.forEach(subcategory => {
+                const option = document.createElement('option');
+                option.value = subcategory._id; // Assuming subcategory has _id property
+
+                option.textContent = subcategory.subCategoryName; // Assuming subcategory has name property
+                subCategorySelect.appendChild(option);
+              });
+            } else {
+              const option = document.createElement('option');
+              option.value = "";
+              option.textContent = "No subcategories available";
+              subCategorySelect.appendChild(option);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching subcategories:', error);
           });
-        } else {
-          const option = document.createElement('option');
-          option.value = "";
-          option.textContent = "No subcategories available";
-          subCategorySelect.appendChild(option);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching subcategories:', error);
-      });
-    }
-  });
-});
-//preview image
-function previewImage(input, previewId) {
-      const file = input.files[0];
-      const preview = document.getElementById(previewId);
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-        }
-        reader.readAsDataURL(file);
-      } else {
-        preview.style.display = 'none';
       }
+    });
+  });
+  //preview image
+  function previewImage(input, previewId) {
+    const file = input.files[0];
+    const preview = document.getElementById(previewId);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      }
+      reader.readAsDataURL(file);
+    } else {
+      preview.style.display = 'none';
     }
+  }
 
-    document.getElementById('image1').addEventListener('change', function () {
-      previewImage(this, 'image1_preview');
-    });
-    document.getElementById('image2').addEventListener('change', function () {
-      previewImage(this, 'image2_preview');
-    });
-    document.getElementById('image3').addEventListener('change', function () {
-      previewImage(this, 'image3_preview');
-    });
-    document.getElementById('image4').addEventListener('change', function () {
-      previewImage(this, 'image4_preview');
-    });
+  document.getElementById('image1').addEventListener('change', function () {
+    previewImage(this, 'image1_preview');
+  });
+  document.getElementById('image2').addEventListener('change', function () {
+    previewImage(this, 'image2_preview');
+  });
+  document.getElementById('image3').addEventListener('change', function () {
+    previewImage(this, 'image3_preview');
+  });
+  document.getElementById('image4').addEventListener('change', function () {
+    previewImage(this, 'image4_preview');
+  });
 
 </script>
