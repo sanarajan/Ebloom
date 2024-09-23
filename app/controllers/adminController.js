@@ -8,10 +8,10 @@ exports.index = async (req, res) => {
   //  let password = bcrypt.hashSync("admin", salt);
   try {
     if (!req.session.adusername) {
-      res.render("admin/adminLogin", { layout: false });
+      res.render("admin/adminlogin", { layout: false });
     } else {
       if (req.session.passwordWrong) {
-        res.render("admin/adminLogin", { msg: "Invalid Login" });
+        res.render("admin/adminlogin", { msg: "Invalid Login" });
       } else {
         res.redirect("/admin/adminHome"); // Redirects to home if login is successful
       }
@@ -41,7 +41,7 @@ exports.adminlogin = async (req, res) => {
         res.redirect("/admin/adminHome");
       } else {
         req.session.adpasswordWrong = true;
-        res.render("admin/adminLogin", {
+        res.render("admin/adminlogin", {
           // Corrected the path to render adminLogin
           pwIncorrect: "User not found or invalid credentials",
         });
