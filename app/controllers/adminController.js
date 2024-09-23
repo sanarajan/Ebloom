@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const moment = require("moment");
 const Order = require("../models/orderModel");
-
 exports.index = async (req, res) => {
   //   const salt = bcrypt.genSaltSync(10);
   //  let password = bcrypt.hashSync("admin", salt);
