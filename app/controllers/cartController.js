@@ -786,6 +786,7 @@ exports.payment = async (req, res) => {
         totalMRP += product.price * item.quantity;
       }
     }
+    console.log( totalPrice+" -"+ totalDiscount)
     totalPrice = totalPrice - totalDiscount;
 
     // Add delivery charges and packaging fee
@@ -1021,7 +1022,7 @@ exports.placeOrder = async (req, res) => {
 
         let discountProduct = (itemTotalValue / totalPrice) * discount; // Coupon discount split
         discountProduct = Math.round(discountProduct);
-
+        totalPrice =totalPrice-discountProduct;
         offerPrice = offerPrice * item.quantity - discountProduct;
 
         totalItems += item.quantity;
@@ -1185,7 +1186,6 @@ exports.verifyPayment = async (req, res) => {
 
 
 exports.paymentSuccess = async (req, res) => {
-  console.log("FGJFGJ")
   const { orderId } = req.params;
 //  const orderId = req.params.orderId
 res.render("user/paymentSuccess", { orderId :orderId});
