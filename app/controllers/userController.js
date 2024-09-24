@@ -3,7 +3,6 @@ const Product = require("../models/productModel");
 const Address = require("../models/addressModel");
 const userOTPVerification = require("../models/userOTPVerification");
 const Wallet = require("../models/walletModel");
-
 const { sendOTPEmail } = require("../../utils/otpEmail");
 const bcrypt = require("bcryptjs"); //password hashing
 const crypto = require("crypto"); //for otp generating
@@ -54,7 +53,8 @@ exports.userRegistration = async (req, res) => {
 
 exports.home = async (req, res) => {
   try {
-    if (req.session.username) {
+    console.log(req.session.useremail)
+    if (req.session.useremail) {
       const homeProducts = await Product.find()
         .sort({ createdAt: -1 })
         .limit(4)
@@ -202,7 +202,7 @@ exports.login = async (req, res) => {
         userType: 2,
         isActive: true,
       });
-      if (user && bcrypt.compareSync(req.body.password, user.password)) {
+      if (user&&user.password && bcrypt.compareSync(req.body.password, user.password)) {
         req.session.userType = user.userType;
         req.session.username = user.username;
         req.session.useremail = user.email;
@@ -328,7 +328,13 @@ exports.profile = async (req, res) => {
       isActive: true,
     });
     if (userData) {
-      const [firstName, lastName] = userData.username.split(" ");
+      let  uname
+      if(userData.username){
+         uname = userData.username
+      }else{
+        uname =userData.displayName
+      }
+      const [firstName, lastName] = uname.split(" ");
       const username= firstName+" "+lastName
       res.render("user/userAccount", {
         showSidebar: true,
@@ -386,7 +392,6 @@ exports.editName = async (req, res) => {
     });
   }
 };
-
 exports.editPhoneNumber = async (req, res) => {
   try {
     console.log("hfg");
@@ -404,7 +409,6 @@ exports.editPhoneNumber = async (req, res) => {
         message: "Phone number must be 10 digits long.",
       });
     }
-
     // Assuming user is authenticated and user ID is in the session
 
     const user = await userModel.findById(userId);
@@ -574,9 +578,8 @@ exports.changePassword = async (req, res) => {
     res.status(500).send("Interna server error");
   }
 };
-exports.updatePassword = async (req, res) => {console.log("ethis")
+exports.updatePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
-console.log(oldPassword+"-"+newPassword)
   try {
       const user = await userModel
       .findOne({ email: req.session.useremail }) ;
@@ -586,10 +589,9 @@ console.log(oldPassword+"-"+newPassword)
           return res.status(404).json({ success:false,message: 'User not found.' });
       }
       const isMatch = await bcrypt.compare(oldPassword, user.password);
-      if (!isMatch) {console.log(" match alla")
+      if (!isMatch) {
           return res.status(400).json({success:false,noMatch:"ok", message: 'Old password is incorrect.' });
       }
-console.log(isMatch+" ismatch")
       // Hash the new password
      // const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -602,4 +604,3 @@ console.log(isMatch+" ismatch")
       res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
-

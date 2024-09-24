@@ -215,7 +215,7 @@ exports.salesReport = async (req, res) => {
        let offerPrice = orderedProduct.offerPrice;
 
         const productDiscount = orderedProduct.discountProduct || 0;
-        let itemTotalPrice = orderedProduct.offerPrice * orderedProduct.quantity;
+        let itemTotalPrice = orderedProduct.offerPrice ;
         let soldPrice = itemTotalPrice - productDiscount;
         totalProfit += soldPrice;
        
