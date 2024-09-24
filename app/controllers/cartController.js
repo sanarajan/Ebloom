@@ -1209,7 +1209,6 @@ exports.paymentFailed = async (req, res) => {
   }
 };
 
-
 exports.myOrders = async (req, res) => {
   try {
     res.render("user/myOrders", { showSidebar: true });
