@@ -619,24 +619,7 @@ exports.checkout = async (req, res) => {
 //uses inside payment function
 async function getCouponsForUserCart(userId) {
   try {
-    // const cart = await Cart.findOne({ user: userId, isActive: true })
-    //   .populate({
-    //     path: "products.product",
-    //     populate: {
-    //       path: "categoryId",
-    //       model: "Category",
-    //     },
-    //   })
-    //   .exec();
-
-    // if (!cart) {
-    //   throw new Error("No active cart found for this user.");
-    // }
-
-    // const productCategories = cart.products.map(
-    //   (item) => item.product.categoryId._id
-    // );
-    // const uniqueCategories = [...new Set(productCategories)];
+    console.log(userId + " id in offer");
 
     const matchingCoupons = await Coupon.find({
       startDate: { $lte: new Date() },
@@ -647,12 +630,24 @@ async function getCouponsForUserCart(userId) {
     const orders = await Order.find({ userId }).lean();
 
     // Get a list of used coupons by the user
-    const usedCoupons = orders.map((order) => order.coupon);
+    const usedCouponsStr = [
+      ...new Set(
+        orders
+          .map((order) => order.coupon?.toString()) // Convert ObjectId to string
+          .filter((coupon) => coupon !== undefined && coupon !== null) // Filter out undefined or null coupons
+      ),
+    ];
 
     // Filter out coupons that the user has already used
-    const filteredCoupons = matchingCoupons.filter(
-      (coupon) => !usedCoupons.includes(coupon._id.toString())
-    );
+    const filteredCoupons = matchingCoupons.filter((coupon) => {
+      const couponIdStr = coupon._id.toString(); // Ensure _id is a string
+
+      console.log(
+        `${couponIdStr} in matching coupons. Used coupons: ${usedCouponsStr}`
+      );
+
+      return !usedCouponsStr.includes(couponIdStr); // Check if coupon is not used
+    });
 
     const formattedCoupons = filteredCoupons.map((coupon) => {
       return {
@@ -670,7 +665,6 @@ async function getCouponsForUserCart(userId) {
             : `₹${coupon.discountValue}`,
       };
     });
-
     return formattedCoupons;
   } catch (err) {
     console.error(err);
@@ -786,7 +780,7 @@ exports.payment = async (req, res) => {
         totalMRP += product.price * item.quantity;
       }
     }
-    console.log( totalPrice+" -"+ totalDiscount)
+    console.log(totalPrice + " -" + totalDiscount);
     totalPrice = totalPrice - totalDiscount;
 
     // Add delivery charges and packaging fee
@@ -824,32 +818,31 @@ exports.payment = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
-exports.createOrder =async (req,res)=>{
-  const { amount, currency,order_Id } = req.body; // amount should be passed in the smallest currency unit (like paise for INR)
+exports.createOrder = async (req, res) => {
+  const { amount, currency, order_Id } = req.body; // amount should be passed in the smallest currency unit (like paise for INR)
   try {
-   
     const options = {
       amount: amount * 100, // converting to the smallest currency unit
-      currency: currency || 'INR',
-      receipt:  crypto.randomBytes(10).toString("hex")
+      currency: currency || "INR",
+      receipt: crypto.randomBytes(10).toString("hex"),
     };
     const order = await razorpayInstance.orders.create(options);
     razorpayOrderId = order.id;
-    console.log("yes here"+razorpayOrderId)
+    console.log("yes here" + razorpayOrderId);
 
     await Order.updateOne(
       { _id: order_Id },
       {
-          $set: { razorpayOrderId: razorpayOrderId },
+        $set: { razorpayOrderId: razorpayOrderId },
       }
-  );
-  console.log("yes here"+razorpayOrderId)
+    );
+    console.log("yes here" + razorpayOrderId);
 
-    res.status(200).json({ success: true, razorpayOrderId:razorpayOrderId});
+    res.status(200).json({ success: true, razorpayOrderId: razorpayOrderId });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
-}
+};
 
 async function generateUniqueOrderId() {
   let isUnique = false;
@@ -861,7 +854,7 @@ async function generateUniqueOrderId() {
 
     // Check if the orderId already exists in the database
     const existingOrder = await Order.findOne({ orderId });
-    
+
     if (!existingOrder) {
       isUnique = true; // If no existing order found, it's unique
     }
@@ -871,7 +864,6 @@ async function generateUniqueOrderId() {
 }
 exports.placeOrder = async (req, res) => {
   try {
-  
     let {
       addressId,
       userId,
@@ -895,11 +887,11 @@ exports.placeOrder = async (req, res) => {
     // totalSavings = req.session.totalSavings || req.body.totalSavings;
     totalAmount = req.session.totalAmount || req.body.totalAmount;
     totalMRP = req.session.totalMRP || req.body.totalMRP;
-   
+
     if (req.session.totalAmount) {
       totalAmount = totalAmount - discount;
     }
-    
+
     //end session fetch
     //RAZOR
     let razorpayOrderId = "";
@@ -922,7 +914,7 @@ exports.placeOrder = async (req, res) => {
     }
     //RAZOR END
     //orderid unique value create
-    
+
     let orderId = await generateUniqueOrderId();
     //end orderid creation
     const address = await Address.findOne({ _id: addressId }).select("-_id");
@@ -942,9 +934,9 @@ exports.placeOrder = async (req, res) => {
     }, 0);
     //////////
     if (req.body.paymentType === "COD") {
-      paymentStatus="Completed"
-    }else{
-      paymentStatus="Pending"
+      paymentStatus = "Completed";
+    } else {
+      paymentStatus = "Pending";
     }
     const cartItemsWithDetails = await Promise.all(
       cart.products.map(async (item) => {
@@ -1022,7 +1014,7 @@ exports.placeOrder = async (req, res) => {
 
         let discountProduct = (itemTotalValue / totalPrice) * discount; // Coupon discount split
         discountProduct = Math.round(discountProduct);
-        totalPrice =totalPrice-discountProduct;
+        totalPrice = totalPrice - discountProduct;
         offerPrice = offerPrice * item.quantity - discountProduct;
 
         totalItems += item.quantity;
@@ -1051,12 +1043,12 @@ exports.placeOrder = async (req, res) => {
           offerPrice: offerPrice, // Price after applying offer
           offerId: offerId,
           discountOffer: discountOffer,
-          paymentStatus: 'Pending',
+          paymentStatus: "Pending",
         };
       })
     );
     console.log(totalOrderValue + " orders");
-   
+
     const newOrder = new Order({
       orderId,
       paymentMethod: req.body.paymentType,
@@ -1073,7 +1065,7 @@ exports.placeOrder = async (req, res) => {
       totalDiscount: totalDiscount,
       orderedProducts: cartItemsWithDetails,
       razorpayOrderId: razorpayOrderId,
-      paymentStatus:paymentStatus
+      paymentStatus: paymentStatus,
     });
     // Log the newOrder for debugging purposes
     console.log(newOrder + " newOrder");
@@ -1104,8 +1096,8 @@ exports.placeOrder = async (req, res) => {
       delete req.session.totalItems;
       delete req.session.totalPrice;
       delete req.session.totalAmount;
-      delete req.session.totalMRP
-      console.log("last"+orderId)
+      delete req.session.totalMRP;
+      console.log("last" + orderId);
       return res.json({
         success: true,
         message: "Order placed successfully",
@@ -1113,7 +1105,7 @@ exports.placeOrder = async (req, res) => {
         razorpayOrderId: razorpayOrderId,
         amount: totalAmount * 100,
       });
-    
+
       //res.render("user/paymenySuccess", { orderId });
     }
   } catch (error) {
@@ -1132,81 +1124,84 @@ exports.verifyPayment = async (req, res) => {
 
   // Verify the signature
   if (digest !== razorpaySignature) {
-      console.log("----Signature mismatch----");
-      await Order.updateOne(
-          { razorpayOrderId: razorpayOrderId },
-          {
-              $set: { paymentStatus: "Failed", razorpayPaymentId: razorpayPaymentId },
-          }
-      );
-      return res.status(400).json({
-          success: false,
-          message: "Payment verification failed due to signature mismatch",
-      });
+    console.log("----Signature mismatch----");
+    await Order.updateOne(
+      { razorpayOrderId: razorpayOrderId },
+      {
+        $set: { paymentStatus: "Failed", razorpayPaymentId: razorpayPaymentId },
+      }
+    );
+    return res.status(400).json({
+      success: false,
+      message: "Payment verification failed due to signature mismatch",
+    });
   }
 
   try {
-      const payment = await razorpayInstance.payments.fetch(razorpayPaymentId);
+    const payment = await razorpayInstance.payments.fetch(razorpayPaymentId);
 
-      if (payment.status !== 'captured') {
-          console.log("Non-success Payment Status: ", payment.status);
-          await Order.updateOne(
-              { razorpayOrderId: razorpayOrderId },
-              {
-                  $set: { paymentStatus: payment.status, razorpayPaymentId: razorpayPaymentId },
-              }
-          );
-          return res.status(400).json({
-              success: false,
-              message: "Payment was not successful",
-          });
-      }
-
-      const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
-      if (!order) {
-          return res.status(404).send("Order not found");
-      }
-      console.log("status success aayi")
-
-      order.razorpayPaymentId = razorpayPaymentId;
-      order.paymentStatus = "Completed";
-      await order.save();
-
-      return res.status(200).json({
-          success: true,
-          message: "Payment verified successfully",
-          orderId:order.orderId
+    if (payment.status !== "captured") {
+      console.log("Non-success Payment Status: ", payment.status);
+      await Order.updateOne(
+        { razorpayOrderId: razorpayOrderId },
+        {
+          $set: {
+            paymentStatus: payment.status,
+            razorpayPaymentId: razorpayPaymentId,
+          },
+        }
+      );
+      return res.status(400).json({
+        success: false,
+        message: "Payment was not successful",
       });
+    }
 
+    const order = await Order.findOne({ razorpayOrderId: razorpayOrderId });
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+    console.log("status success aayi");
+
+    order.razorpayPaymentId = razorpayPaymentId;
+    order.paymentStatus = "Completed";
+    await order.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment verified successfully",
+      orderId: order.orderId,
+    });
   } catch (error) {
-      console.error("Error fetching payment details:", error);
-      return res.status(500).send("Error updating order status");
+    console.error("Error fetching payment details:", error);
+    return res.status(500).send("Error updating order status");
   }
 };
 
-
 exports.paymentSuccess = async (req, res) => {
   const { orderId } = req.params;
-//  const orderId = req.params.orderId
-res.render("user/paymentSuccess", { orderId :orderId});
-}
+  //  const orderId = req.params.orderId
+  res.render("user/paymentSuccess", { orderId: orderId });
+};
 
 exports.paymentFailedPage = async (req, res) => {
-  res.render("user/paymentFailedPage", { orderId :"hgjhgj"});
-  }
+  res.render("user/paymentFailedPage", { orderId: "hgjhgj" });
+};
 //RAZOR VERIFY
 exports.paymentFailed = async (req, res) => {
   const { orderId } = req.body;
   try {
-      // Update the order status to 'Failed' or 'Canceled'
-      await Order.updateOne(
-          { razorpayOrderId: orderId },
-          { $set: { paymentStatus: 'Failed' } }
-      );
-      res.status(200).json({ success: true });
+    // Update the order status to 'Failed' or 'Canceled'
+    await Order.updateOne(
+      { razorpayOrderId: orderId },
+      { $set: { paymentStatus: "Failed" } }
+    );
+    res.status(200).json({ success: true });
   } catch (error) {
-      console.error('Error marking payment as failed:', error);
-      res.status(500).json({ success: false, message: 'Failed to update payment status.' });
+    console.error("Error marking payment as failed:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update payment status." });
   }
 };
 
@@ -1225,7 +1220,9 @@ exports.fetchOrders = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Fetch userId based on email in session
-    const fetchUserId = await userModel.findOne({ email: req.session.useremail });
+    const fetchUserId = await userModel.findOne({
+      email: req.session.useremail,
+    });
     if (!fetchUserId) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -1237,20 +1234,20 @@ exports.fetchOrders = async (req, res) => {
       .limit(limit)
       .sort({ createdAt: -1 })
       .populate({
-        path: 'userId',
-        select: 'username email displayName', // Include user details
+        path: "userId",
+        select: "username email displayName", // Include user details
       })
       .populate({
-        path: 'orderedProducts.productId',
-        select: 'productName thumbnailPaths price', // Include product details
+        path: "orderedProducts.productId",
+        select: "productName thumbnailPaths price", // Include product details
       })
       .populate({
-        path: 'orderedProducts.category',
-        select: 'categoryName', // Include category details
+        path: "orderedProducts.category",
+        select: "categoryName", // Include category details
       })
       .populate({
-        path: 'orderedProducts.subcategory',
-        select: 'subCategoryName', // Include subcategory details
+        path: "orderedProducts.subcategory",
+        select: "subCategoryName", // Include subcategory details
       })
       .exec();
 
@@ -1259,7 +1256,9 @@ exports.fetchOrders = async (req, res) => {
     const totalPages = Math.ceil(totalOrders / limit);
 
     if (!orders || orders.length === 0) {
-      return res.status(404).json({ success: false, message: "Orders not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Orders not found" });
     }
 
     // Process orders to add deliveryDate and itemTotalPrice
@@ -1439,7 +1438,6 @@ exports.getWishlistData = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 exports.deletWishlist = async (req, res) => {
   try {
