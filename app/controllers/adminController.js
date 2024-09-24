@@ -55,7 +55,6 @@ exports.adminlogin = async (req, res) => {
     res.status(500).send("Internal server error");
   }
 };
-
 exports.adminHome = async (req, res) => {
   try {
     if (req.session.adusername) {
