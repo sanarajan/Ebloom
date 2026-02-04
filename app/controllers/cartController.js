@@ -485,6 +485,11 @@ exports.checkout = async (req, res) => {
       return res.redirect("/login");
     }
 
+    // Calculate delivery date (10 days from now)
+    const deliveryDate = new Date();
+    deliveryDate.setDate(deliveryDate.getDate() + 10);
+    const deliveryDateString = deliveryDate.toDateString();
+console.log(deliveryDateString+" delivery date")
     // Fetch user addresses
     const user = await userModel
       .findById(userId)
@@ -496,7 +501,11 @@ exports.checkout = async (req, res) => {
     const cart = await Cart.find({ user: userId, isActive: true })
       .populate({
         path: "products.product",
-        select: "productName price thumbnailPaths categoryId",
+        select: "productName price thumbnailPaths categoryId subCategoryId",
+        populate: {
+          path: "subCategoryId",
+          select: "subCategory",
+        },
       })
       .exec();
 
@@ -606,6 +615,7 @@ exports.checkout = async (req, res) => {
         totalAmount: totalAmount,
         totalSavings: totalSavings,
         userId: userId,
+        deliveryDate: deliveryDateString,
       });
     } else {
       res.redirect("/");

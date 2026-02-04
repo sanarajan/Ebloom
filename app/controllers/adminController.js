@@ -24,6 +24,7 @@ exports.index = async (req, res) => {
 
 exports.adminlogin = async (req, res) => {
   try {
+   
     if (!req.session.adusername) {
       const user = await User.findOne({
         username: req.body.username,

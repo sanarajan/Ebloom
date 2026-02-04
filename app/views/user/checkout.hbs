@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout Page</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             margin: 0;
@@ -13,7 +17,8 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: #f0f0f0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         .header {
@@ -32,42 +37,95 @@
 
         .content-container {
             display: flex;
-            padding: 20px;
+            padding: 30px;
             margin: 0 10px;
             flex: 1;
+            gap: 25px;
         }
 
         .left-section {
             flex: 70%;
-            padding-right: 20px;
         }
 
         .right-section {
             flex: 30%;
-            padding-left: 20px;
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            border-radius: 16px;
+            padding: 30px;
             margin-bottom: 20px;
             box-sizing: border-box;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .right-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         }
 
         .address-section,
         .cart-details-section {
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
+            background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
             box-sizing: border-box;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .address-section:hover,
+        .cart-details-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         }
 
         .address-section h4,
         .cart-details-section h4,
         .right-section h4 {
             margin-top: 0;
-            font-size: 26px;
-            line-height: 1.5;
-            font-weight: bold;
+            margin-bottom: 25px;
+            font-size: 24px;
+            line-height: 1.4;
+            font-weight: 700;
+            color: #2c3e50;
+            position: relative;
+            padding-bottom: 12px;
+        }
+
+        .address-section h4::after,
+        .cart-details-section h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            border-radius: 2px;
+        }
+
+        .right-section h4 {
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 3px solid #007bff;
+        }
+
+        .right-section h4::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            border-radius: 2px;
         }
 
         .address-list {
@@ -77,104 +135,242 @@
         .address-item {
             display: flex;
             align-items: center;
-            border-bottom: 1px solid #ddd;
-            padding: 10px 0;
-            font-size: 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            font-size: 17px;
             line-height: 1.8;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .address-item:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.1);
         }
 
         .address-item input[type="radio"] {
-            margin-right: 10px;
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #007bff;
+        }
+
+        .address-item label {
+            flex: 1;
+            cursor: pointer;
+            color: #495057;
+        }
+
+        .address-item label strong {
+            color: #2c3e50;
+            font-size: 18px;
+            display: block;
+            margin-bottom: 5px;
         }
 
         .deliver-here-button,
-        .edit-address-button {
-            background-color: #007bff;
+        .edit-address-button,
+        .edit-here-button,
+        .change-here-button {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 10px 15px;
+            border-radius: 10px;
+            padding: 10px 20px;
             cursor: pointer;
-            font-size: 16px;
-            margin-left: auto;
-            margin-right: 15px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .deliver-here-button:hover,
-        .edit-address-button:hover {
-            background-color: #0056b3;
+        .edit-address-button:hover,
+        .edit-here-button:hover,
+        .change-here-button:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 123, 255, 0.4);
         }
 
         .edit-here-button {
-            margin-left: auto;
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
 
+        .edit-here-button:hover {
+            background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+            box-shadow: 0 6px 18px rgba(40, 167, 69, 0.4);
+        }
 
+        .change-here-button {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+            color: #000;
+        }
+
+        .change-here-button:hover {
+            background: linear-gradient(135deg, #e0a800 0%, #d39e00 100%);
+            box-shadow: 0 6px 18px rgba(255, 193, 7, 0.4);
         }
 
         .add-address-button {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 10px 15px;
+            border-radius: 12px;
+            padding: 15px 25px;
             cursor: pointer;
             font-size: 18px;
+            font-weight: 700;
             text-align: center;
             display: block;
             margin-top: 10px;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease;
         }
 
         .add-address-button:hover {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .address-form-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        .address-form-section h4 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 22px;
+            color: #2c3e50;
+            font-weight: 700;
         }
 
         .new-address-form {
-            display: none;
             margin-top: 20px;
         }
 
         .new-address-form input,
         .new-address-form textarea {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #ffffff;
+        }
+
+        .new-address-form input:focus,
+        .new-address-form textarea:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.2);
         }
 
         .new-address-form button {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 10px 15px;
+            border-radius: 10px;
+            padding: 12px 20px;
             cursor: pointer;
-            font-size: 18px;
-            display: block;
-            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            display: inline-block;
+            margin-right: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
         }
 
         .new-address-form button:hover {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            font-weight: 600;
         }
 
         .cart-item {
             display: flex;
-            border-radius: 8px;
-            background: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #ffffff 0%, #fafbfc 100%);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 25px;
             align-items: center;
-            height: 200px;
+            min-height: 200px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cart-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #007bff, #0056b3);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .cart-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .cart-item:hover::before {
+            transform: scaleY(1);
         }
 
         .cart-item img {
-            max-width: 150px;
-            max-height: 150px;
-            margin-right: 20px;
-            border-radius: 8px;
+            max-width: 170px;
+            max-height: 170px;
+            margin-right: 25px;
+            border-radius: 12px;
             object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .cart-item:hover img {
+            transform: scale(1.05);
         }
 
         .cart-item-details {
@@ -184,104 +380,246 @@
 
         .product-name {
             font-size: 22px;
-            font-weight: bold;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
         }
 
         .product-specification {
-            font-size: 18px;
-            color: #555;
+            font-size: 16px;
+            color: #6c757d;
+            margin-bottom: 8px;
         }
 
         .product-status {
-            font-size: 18px;
-            color: #d9534f;
+            font-size: 15px;
+            color: #28a745;
+            font-weight: 600;
+            background: #d4edda;
+            padding: 5px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 10px;
         }
 
         .product-price {
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 24px;
+            font-weight: 700;
+            color: #28a745;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .product-price .original-price {
+            font-size: 18px;
+            color: #6c757d;
+            text-decoration: line-through;
+            font-weight: 500;
+        }
+
+        .product-price .offer {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         .product-delivery {
-            font-size: 16px;
-            color: #777;
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 8px;
         }
-
-
 
         .quantity-controls {
             display: flex;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 15px;
+            gap: 10px;
         }
 
         .quantity-controls button {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
+            border-radius: 8px;
+            padding: 8px 15px;
             cursor: pointer;
             font-size: 16px;
-            margin: 0 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
         }
 
         .quantity-controls button:hover {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #0056b3 0%, #003d82 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
         }
 
         .quantity-controls span {
             margin: 0 10px;
             font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
         }
 
         .cancel-button {
-            background-color: #dc3545;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 10px 15px;
+            border-radius: 10px;
+            padding: 10px 20px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: 600;
             margin-left: auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .cancel-button:hover {
-            background-color: #c82333;
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
         }
 
         .place-order-button {
-            background-color: #007bff;
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 18px 25px;
             cursor: pointer;
             text-align: center;
             font-size: 20px;
+            font-weight: 700;
             display: block;
             width: 100%;
             margin-top: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
         }
 
         .place-order-button:hover {
-            background-color: #0056b3;
+            background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        .place-order-button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
 
         .summary-detail {
-            font-size: 18px;
-            line-height: 1.8;
-            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 17px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            padding: 12px 0;
+            color: #495057;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            transition: background 0.2s ease;
+        }
+
+        .summary-detail:hover {
+            background: rgba(0, 123, 255, 0.03);
+            padding-left: 8px;
+            padding-right: 8px;
+            border-radius: 8px;
+        }
+
+        .summary-detail:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-top: 20px;
+            border-top: 2px solid rgba(0, 123, 255, 0.2);
         }
 
         .summary-detail span {
-            float: right;
-            font-weight: bold;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .summary-detail strong {
+            font-weight: 700;
+            font-size: 20px;
+            color: #2c3e50;
         }
 
         .button-container {
             margin-left: auto;
+            display: flex;
+            gap: 10px;
         }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #003d82);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .content-container {
+                flex-direction: column;
+            }
+            
+            .right-section {
+                position: relative;
+                top: 0;
+                margin-top: 20px;
+            }
+        }
+    </style>
     </style>
 </head>
 
@@ -385,18 +723,20 @@
                     {{/if}}
                     <div class="cart-item-details">
                         <div class="product-name">{{product.productName}}</div>
-                        <div class="product-specification">Category: {{product.subCategoryId}}</div>
-                        <!-- Adjust as needed -->
-                        <div class="product-status">Delivered on {{this.deliveredOn}}</div> <!-- Adjust if necessary -->
-                        <div class="product-price">₹{{product.price}}</div>
-                        <div class="product-delivery">Your item has been delivered</div>
-                        {{!-- <div class="quantity-controls">
-                            <button onclick="changeQuantity({{product._id}}, -1)">-</button>
-                            <span>{{this.quantity}}</span>
-                            <button onclick="changeQuantity({{product._id}}, 1)">+</button>
-                            <button class="remove-button" onclick="removeItem({{product._id}})">Remove</button>
-
-                        </div> --}}
+                        <div class="product-specification">Quantity: {{this.quantity}}</div>
+                        <div class="product-status">In Stock</div>
+                        <div class="product-price">
+                            {{#if product.offerPercentage}}
+                                <span>₹{{product.offerPrice}}</span>
+                                <span class="original-price">₹{{product.price}}</span>
+                                <span class="offer">{{product.offerPercentage}}% OFF</span>
+                            {{else}}
+                                <span>₹{{product.price}}</span>
+                            {{/if}}
+                        </div>
+                        {{!-- Always show offerPercentage for debugging --}}
+                        <div style="color:red;font-size:12px;">DEBUG: offerPercentage = {{product.offerPercentage}}</div>
+                        <div class="product-delivery">Delivery by <span class="delivery-date">{{@root.deliveryDate}}</span> | Free</div>
                     </div>
                 </div>
                 {{/each}}

@@ -1,62 +1,178 @@
-<!-- Banner -->
-<div class="banner-image"></div>
-<!-- Main Content -->
-<div class="container my-5">
-  <div class="text-center mb-4">
-    <h1 class="section-heading">Welcome to EBloom - Your Online Plant Nursery<br> Bringing nature closer to You.</h1>
-    <p class="description">At E-Bloom, we believe in the power of plants to transform spaces and uplift spirits.Whether
-      you're a seasoned gardener or<br> just starting out, we have something special for everyone.</p>
-  </div>
-
-  <!-- Our Collection -->
-  <h2 class="section-heading mt-5">Our Collection</h2>
-  <div class="our-collection">
-    <!-- Repeat this block for each section -->
-    <div class="collection-item">
-      <h3>Flowering Plants</h3>
-      <p>Brighten up your garden or home with our vibrant.</p>
-    </div>
-    <div class="collection-item">
-      <h3>Outdoor Plants</h3>
-      <p>Create a lush, green oasis in your backyard with our outdoor plants.</p>
-    </div>
-    <div class="collection-item">
-      <h3>Succulents & Cacti</h3>
-      <p>Discover the charm of low-maintenance, drought-resistant plants</p>
-    </div>
-    <div class="collection-item">
-      <h3>Indoor Plant</h3>
-      <p>Discover the charm of low-maintenance, drought-resistant plants</p>
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-content">
+      <h1>Bringing Nature Closer to You</h1>
+      <p>Discover a premium collection of plants, seeds, and gardening essentials to transform your space into a green sanctuary</p>
+      <a href="/shop" class="btn-primary-custom">Start Shopping</a>
     </div>
   </div>
+</section>
 
-  <!-- New Arrivals -->
-  <h2 class="section-heading mt-5">New Arrivals</h2>
-  <div class="row">
-    {{#each homeProducts}}
-    <div class="col-md-3 col-sm-6 mb-4">
-      <a href="/productDetails/{{this._id}}" class="text-decoration-none" style="cursor:pointer">
+<!-- Categories Section -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-heading">Shop by Category</h2>
+    <p class="section-subtitle">Explore our diverse collection of plants</p>
+    
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="category-card">
+          <div class="category-icon">🌸</div>
+          <h3>Flowering Plants</h3>
+          <p>Colorful blooms to brighten any space</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="category-card">
+          <div class="category-icon">🌴</div>
+          <h3>Indoor Plants</h3>
+          <p>Perfect for home and office decor</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="category-card">
+          <div class="category-icon">🌵</div>
+          <h3>Succulents</h3>
+          <p>Low-maintenance hardy plants</p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="category-card">
+          <div class="category-icon">🌿</div>
+          <h3>Outdoor Plants</h3>
+          <p>Create your dream garden</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <div class="card position-relative">
-          <img src="{{this.thumbnailPaths.[0]}}" class="card-img-top" alt="{{this.productName}}">
-          <div class="icon-top-left">
-            <a href="/" class="btn btn-primary btn-icon"><i class="fa fa-shopping-cart"></i></a>
+<!-- Featured Products -->
+<section class="section bg-light">
+  <div class="container">
+    <h2 class="section-heading">Featured Products</h2>
+    <p class="section-subtitle">Hand-picked selections from our collection</p>
+    
+    <div class="row g-4">
+      {{#each homeProducts}}
+      <div class="col-md-6 col-lg-3">
+        <div class="product-card">
+          <div class="product-image-wrapper">
+            <img src="{{this.thumbnailPaths.[0]}}" alt="{{this.productName}}">
+            {{#if this.discount}}<div class="product-badge">-{{this.discount}}%</div>{{/if}}
+            <div class="product-actions">
+              <button class="action-btn" title="Add to Wishlist" onclick="addToWishlist('{{this._id}}')">
+                <i class="fas fa-heart"></i>
+              </button>
+              <a href="/productDetails/{{this._id}}" class="action-btn" title="View Details">
+                <i class="fas fa-eye"></i>
+              </a>
+              <button class="action-btn add-to-cart-btn" data-id="{{this._id}}" title="Add to Cart">
+                <i class="fas fa-shopping-cart"></i>
+              </button>
+            </div>
           </div>
-          <div class="icon-wishlist">
-            <a href="/" class="btn btn-outline-secondary btn-icon"><i class="fa fa-heart"></i></a>
-          </div>
-          <div class="card-body">
-            <h5 class="card-title">{{this.productName}}</h5>
-            <p class="card-text">{{this.price}} Rs</p>
+          <div class="product-info">
+            <span class="product-category">{{this.category}}</span>
+            <h5 class="product-name">{{this.productName}}</h5>
+            <div class="product-rating">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+              <span>(4.5)</span>
+            </div>
+            <div class="product-price">
+              <span class="product-price-new">₹{{this.price}}</span>
+              {{#if this.originalPrice}}<span class="product-price-old">₹{{this.originalPrice}}</span>{{/if}}
+            </div>
           </div>
         </div>
-      </a>
+      </div>
+      {{/each}}
     </div>
-    {{/each}}
-  </div>
-  <div class="text-center mt-4">
-    <a href="/" class="btn btn-primary">View All</a>
-  </div>
-</div>
 
-<!-- Footer -->
+    <div class="text-center mt-5">
+      <a href="/shop" class="btn-primary-custom">View All Products</a>
+    </div>
+  </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="section">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-3 text-center">
+        <div style="font-size: 2.5rem; color: var(--accent-green); margin-bottom: 1rem;">
+          <i class="fas fa-truck"></i>
+        </div>
+        <h5>Free Shipping</h5>
+        <p>On orders above ₹500</p>
+      </div>
+      <div class="col-md-3 text-center">
+        <div style="font-size: 2.5rem; color: var(--accent-green); margin-bottom: 1rem;">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h5>100% Secure</h5>
+        <p>Safe transactions guaranteed</p>
+      </div>
+      <div class="col-md-3 text-center">
+        <div style="font-size: 2.5rem; color: var(--accent-green); margin-bottom: 1rem;">
+          <i class="fas fa-undo"></i>
+        </div>
+        <h5>Easy Returns</h5>
+        <p>30-day return policy</p>
+      </div>
+      <div class="col-md-3 text-center">
+        <div style="font-size: 2.5rem; color: var(--accent-green); margin-bottom: 1rem;">
+          <i class="fas fa-headset"></i>
+        </div>
+        <h5>Support 24/7</h5>
+        <p>Dedicated customer service</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const productId = this.dataset.id;
+    // Add to cart logic here
+    fetch('/addCart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ productId: productId, quantity: 1 })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success) {
+        Swal.fire('Success', 'Product added to cart!', 'success');
+      }
+    })
+    .catch(err => console.log(err));
+  });
+});
+
+function addToWishlist(productId) {
+  fetch('/addToWishlist', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productId: productId })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.success) {
+      Swal.fire('Added to Wishlist!', '', 'success');
+    }
+  })
+  .catch(err => console.log(err));
+}
+</script>
