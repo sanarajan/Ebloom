@@ -110,4 +110,13 @@ handlebars.registerHelper("dateCaldaerFormate", function (dateString) {
 handlebars.registerHelper("ifEquals", function (arg1, arg2, options) {
   return arg1 == arg2 ? options.fn(this) : options.inverse(this);
 });
+
+handlebars.registerHelper("imagePath", function (path) {
+  if (!path) return "/images/placeholder.jpg"; // Fallback image if needed
+  if (path.startsWith("http")) {
+    return path;
+  }
+  return path.startsWith("/") ? path : "/" + path;
+});
+
 module.exports = handlebars;

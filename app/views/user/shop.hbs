@@ -382,7 +382,7 @@
       productCard.innerHTML = `
           <div class="card" style="cursor:pointer">
             <div class="image-container d-flex justify-content-center align-items-center">
-              <img src="${product.thumbnailPaths[0]}" alt="Product Image" class="img-fluid">
+              <img src="${imagePath(product.thumbnailPaths[0])}" alt="Product Image" class="img-fluid">
             </div>
             <div class="card-body">
               <h5 class="card-title">${product.productName}</h5>
@@ -400,6 +400,7 @@
               </div>
             </div>
             <div class="icons">
+              <i class="fas fa-shopping-cart nav-icon text-muted me-2" style="cursor:pointer" onclick="addToCart('${product._id}', event)" title="Add to Cart"></i>
               <i id="wishlist-icon${product._id}" class="wishlist-icon fas fa-heart ${product.inWishlist ? 'active' : ''}" onclick="toggleWishlist('${product._id}', event)"></i>
             </div>
           </div>
@@ -570,6 +571,28 @@
   }
   // Fetch initial product list without sorting
 
+
+  // wishlist
+  async function addToCart(productId, event) {
+    if (event) event.stopPropagation();
+    try {
+      const response = await fetch('/addToCart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ productId, quantity: 1 })
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        openCartDrawer();
+      } else {
+        Swal.fire('Error', data.message || 'Error adding to cart', 'error');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
+  }
 
   //wishlist
   async function toggleWishlist(productId, event) {

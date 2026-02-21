@@ -7,7 +7,7 @@ function isUserAuthenticated(req, res, next) {
     next();
   } else {
     // User is not authenticated, redirect to login page
-    res.redirect("/");
+    res.redirect("/login");
   }
 }
 module.exports = isUserAuthenticated;

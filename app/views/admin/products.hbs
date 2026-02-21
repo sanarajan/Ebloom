@@ -41,7 +41,7 @@
                 {{#if products}}
                 {{#each products}}
                 <tr>
-                  <td><img src="/{{this.thumbnailPaths.[0]}}" style="height:30px;width:30px"></td>
+                  <td><img src="{{imagePath this.thumbnailPaths.[0]}}" style="height:30px;width:30px"></td>
                   <td>{{this.productName}}</td>
                   <td>{{this.subCategoryId.categoryId.categoryName}}</td>
                   <td>{{this.subCategoryId.subCategoryName}}</td>

@@ -366,126 +366,126 @@
     ///my code
     // script.js
 
-// Function to fetch and populate dashboard data
-function loadDashboardData(filterValue="") {  
-     fetch(`/admin/fetchDashboard?filter=${filterValue}`)  // Adjust the URL to your API endpoint
+    // Function to fetch and populate dashboard data
+    function loadDashboardData(filterValue = "") {
+      fetch(`/admin/fetchDashboard?filter=${filterValue}`)  // Adjust the URL to your API endpoint
         .then(response => response.json())
         .then(data => {
-            const tableBody = document.querySelector('#topSellingTable tbody');
-            tableBody.innerHTML = ''; // Clear any existing content
-            const cateTableBody = document.querySelector('#topSellingCategory tbody');
-            cateTableBody.innerHTML = '';
-            document.getElementById('totalSales').textContent = data.totalSales;
-            document.getElementById('totalRevenue').textContent = data.totalRevenue;
-            document.getElementById('customerCount').textContent = data.customerCount;
-            let totProductPrice =0
-            if (data.topProducts) {
-                data.topProducts.forEach(product => {
-                     totProductPrice = product.price-(parseInt(product.discountProduct)+parseInt(product.discountOffer))
-                    const row = document.createElement('tr');
+          const tableBody = document.querySelector('#topSellingTable tbody');
+          tableBody.innerHTML = ''; // Clear any existing content
+          const cateTableBody = document.querySelector('#topSellingCategory tbody');
+          cateTableBody.innerHTML = '';
+          document.getElementById('totalSales').textContent = data.totalSales;
+          document.getElementById('totalRevenue').textContent = data.totalRevenue;
+          document.getElementById('customerCount').textContent = data.customerCount;
+          let totProductPrice = 0
+          if (data.topProducts) {
+            data.topProducts.forEach(product => {
+              totProductPrice = product.price - (parseInt(product.discountProduct) + parseInt(product.discountOffer))
+              const row = document.createElement('tr');
 
-                    row.innerHTML = `
-                        <th scope="row"><a href="#"><img src="/${product.image}" alt="${product.productName}" style="width: 50px; height: auto;"></a></th>
+              row.innerHTML = `
+                        <th scope="row"><a href="#"><img src="${imagePath(product.image)}" alt="${product.productName}" style="width: 50px; height: auto;"></a></th>
                         <td><a href="#" class="text-primary fw-bold">${product.productName}</a></td>
                         <td>${totProductPrice}</td>
                         <td class="fw-bold">${product.totalSold}</td>
                         <td>${product.totalRevenue}</td>
                     `;
 
-                    tableBody.appendChild(row);
-                });
-            }
+              tableBody.appendChild(row);
+            });
+          }
 
-            if (data.topCategories) {
-                data.topCategories.forEach(category => {
-                    const row = document.createElement('tr');
+          if (data.topCategories) {
+            data.topCategories.forEach(category => {
+              const row = document.createElement('tr');
 
-                    row.innerHTML = `
+              row.innerHTML = `
                         <td><a href="#" class="text-primary fw-bold">${category.categoryName}</a></td>
                         <td class="fw-bold">${category.totalSold}</td>
                     `;
 
-                    cateTableBody.appendChild(row);
-                });
-            }
+              cateTableBody.appendChild(row);
+            });
+          }
 
-            if (data.ok) {
-                // Extracting data from the API response
-                const salesData = data.productData ? JSON.parse(data.productData) : [];
-                const revenueData = data.totalRevenue ? JSON.parse(data.totalRevenue) : [];
-                const subCategoryData = data.subCategoryData ? JSON.parse(data.subCategoryData) : [];
-               const topSubCategories = typeof data.topSubCategories === 'string' 
-                ? JSON.parse(data.topSubCategories) 
-                : data.topSubCategories;
+          if (data.ok) {
+            // Extracting data from the API response
+            const salesData = data.productData ? JSON.parse(data.productData) : [];
+            const revenueData = data.totalRevenue ? JSON.parse(data.totalRevenue) : [];
+            const subCategoryData = data.subCategoryData ? JSON.parse(data.subCategoryData) : [];
+            const topSubCategories = typeof data.topSubCategories === 'string'
+              ? JSON.parse(data.topSubCategories)
+              : data.topSubCategories;
 
             if (Array.isArray(topSubCategories)) {
-                const chartData = topSubCategories.map(item => ({
-                    value: item.totalSold,
-                    name: item.subCategoryName
-                }));
-                // Initialize ECharts
-                const chart = echarts.init(document.querySelector("#trafficChart"));
+              const chartData = topSubCategories.map(item => ({
+                value: item.totalSold,
+                name: item.subCategoryName
+              }));
+              // Initialize ECharts
+              const chart = echarts.init(document.querySelector("#trafficChart"));
 
-                chart.setOption({
-                    tooltip: {
-                        trigger: 'item'
-                    },
-                    legend: {
-                        top: '5%',
-                        left: 'center'
-                    },
-                    series: [{
-                        name: 'Total Selling',
-                        type: 'pie',
-                        radius: ['40%', '70%'],
-                        avoidLabelOverlap: false,
-                        label: {
-                            show: false,
-                            position: 'center'
-                        },
-                        emphasis: {
-                            label: {
-                                show: true,
-                                fontSize: '18',
-                                fontWeight: 'bold'
-                            }
-                        },
-                        labelLine: {
-                            show: false
-                        },
-                        data: chartData
-                    }]
-                });
+              chart.setOption({
+                tooltip: {
+                  trigger: 'item'
+                },
+                legend: {
+                  top: '5%',
+                  left: 'center'
+                },
+                series: [{
+                  name: 'Total Selling',
+                  type: 'pie',
+                  radius: ['40%', '70%'],
+                  avoidLabelOverlap: false,
+                  label: {
+                    show: false,
+                    position: 'center'
+                  },
+                  emphasis: {
+                    label: {
+                      show: true,
+                      fontSize: '18',
+                      fontWeight: 'bold'
+                    }
+                  },
+                  labelLine: {
+                    show: false
+                  },
+                  data: chartData
+                }]
+              });
 
-                // Resize chart on window resize
-                window.addEventListener('resize', () => {
-                    chart.resize();
-                });
+              // Resize chart on window resize
+              window.addEventListener('resize', () => {
+                chart.resize();
+              });
             }
-       
-            } else {
-                console.error("Error loading dashboard data");
-            }
+
+          } else {
+            console.error("Error loading dashboard data");
+          }
         })
         .catch(error => {
-            console.error('Error loading dashboard data:', error);
+          console.error('Error loading dashboard data:', error);
         });
-}
+    }
 
-// Function to handle filter changes
-function setupFilters() {
-    const filterSelect = document.querySelector('#commonFilter'); // Adjust selector to your filter element
-    filterSelect.addEventListener('change', () => {
+    // Function to handle filter changes
+    function setupFilters() {
+      const filterSelect = document.querySelector('#commonFilter'); // Adjust selector to your filter element
+      filterSelect.addEventListener('change', () => {
         const filterValue = filterSelect.value;
         loadDashboardData(filterValue)
-    });
-}
+      });
+    }
 
-// Event listener for page load
-document.addEventListener('DOMContentLoaded', () => {
-    loadDashboardData();
-    setupFilters();
-});
+    // Event listener for page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboardData();
+      setupFilters();
+    });
 
 
   </script>

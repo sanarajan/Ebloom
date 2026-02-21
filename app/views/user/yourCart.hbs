@@ -8,6 +8,7 @@
         background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     .header {
         width: 100%;
     }
@@ -263,9 +264,12 @@
     }
 
     @keyframes pulse {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: scale(1);
         }
+
         50% {
             transform: scale(1.05);
         }
@@ -397,7 +401,7 @@
         .content-container {
             flex-direction: column;
         }
-        
+
         .cart-summary {
             position: relative;
             top: 0;
@@ -417,7 +421,7 @@
         {{#each cartItems}}
         <div class="cart-item" data-product-id="{{product._id}}">
             <div class="cart-item-image">
-                <img src="/{{product.image}}" alt="Product Image">
+                <img src="{{imagePath product.image}}" alt="Product Image">
             </div>
             <div class="cart-item-details">
                 <div class="product-name">{{product.name}}</div>
@@ -425,11 +429,11 @@
                 {{!-- <div class="product-specification">Seller: {{product.seller}}</div> --}}
                 <div class="product-price">
                     {{#if product.offerPercentage}}
-                        <span>₹{{product.offerPrice}}</span>
-                        <span class="original-price">₹{{product.price}}</span>
-                        <span class="offer">{{product.offerPercentage}}% OFF</span>
+                    <span>₹{{product.offerPrice}}</span>
+                    <span class="original-price">₹{{product.price}}</span>
+                    <span class="offer">{{product.offerPercentage}}% OFF</span>
                     {{else}}
-                        <span>₹{{product.price}}</span>
+                    <span>₹{{product.price}}</span>
                     {{/if}}
                 </div>
 

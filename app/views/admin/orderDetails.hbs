@@ -92,7 +92,7 @@
 
         {{#each orderedProducts}}
         <tr data-order-id="{{../this.orderId}}" data-user-id="{{../this.userId._id}}">
-            <td><img src="/{{this.image}}" style="width:50px;height:50px" alt="Product Image"></td>
+            <td><img src="{{imagePath this.image}}" style="width:50px;height:50px" alt="Product Image"></td>
             <td>{{productName}}</td>
             <td>{{this.itemTotalPrice}}</td>
             <td id="totalAmt">{{this.offerPrice}}</td>
@@ -142,7 +142,7 @@
                 var orderId = document.getElementById('orderId').value;
                 var userId = document.getElementById('userId').value;
                 var totalAmt = document.getElementById('totalAmt').textContent;
-               
+
                 fetch('/admin/updateOrderStatus', {
                     method: 'POST',
                     headers: {

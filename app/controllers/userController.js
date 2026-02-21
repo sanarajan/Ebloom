@@ -53,24 +53,13 @@ exports.userRegistration = async (req, res) => {
 
 exports.home = async (req, res) => {
   try {
-    console.log(req.session.useremail)
-    if (req.session.useremail) {
-      const homeProducts = await Product.find()
-        .sort({ createdAt: -1 })
-        .limit(4)
-        .lean();
-      res.render("user/home", { homeProducts, showSidebar: false });
-    } else {
-      if (req.session.userPasswordWrong) {
-        res.redirect("/login", {
-          msg: "Incorrect username or password ",
-        });
-      } else {
-        res.redirect("/");
-      }
-    }
+    const homeProducts = await Product.find()
+      .sort({ createdAt: -1 })
+      .limit(4)
+      .lean();
+    res.render("user/home", { homeProducts, showSidebar: false });
   } catch (error) {
-    console.error("Error in index route:", error);
+    console.error("Error in home route:", error);
     res.status(500).send("Internal server error");
   }
 };
@@ -81,7 +70,7 @@ function generateReferralId(firstName) {
 }
 exports.register = async (req, res) => {
   try {
-    const { firstName, lastName, email, password,referalId , phoneNumber } = req.body;
+    const { firstName, lastName, email, password, referalId, phoneNumber } = req.body;
     const username = `${firstName} ${lastName}`;
     const verified = false;
     userType = 2;
@@ -108,11 +97,11 @@ exports.register = async (req, res) => {
         return res.status(400).render('user/userRegistration', {
           errorMessage: 'Invalid referral ID.',
           formData: req.body // pass all the submitted form data
-      });
-      } 
-        
-     
-  }
+        });
+      }
+
+
+    }
 
     // Create new user
     const newUser = new userModel({
@@ -136,18 +125,18 @@ exports.register = async (req, res) => {
 
       await newWallet.save();
       if (referalId) {
-      console.log("yes referal ullathanu")
-          // Credit 200 Rs to the referred user's wallet
-          const wallet = await Wallet.findOne({ userId: result._id });
-          console.log(wallet+" iyale wallet")
-          wallet.Balance += 200;
-          wallet.History.push({
-              TransactionType: 'Referral',
-              Amount: 200,
-              Date: new Date(),
-          });
-          await wallet.save();
-        }
+        console.log("yes referal ullathanu")
+        // Credit 200 Rs to the referred user's wallet
+        const wallet = await Wallet.findOne({ userId: result._id });
+        console.log(wallet + " iyale wallet")
+        wallet.Balance += 200;
+        wallet.History.push({
+          TransactionType: 'Referral',
+          Amount: 200,
+          Date: new Date(),
+        });
+        await wallet.save();
+      }
       req.session.userType = newUser.userType;
       req.session.userId = newUser._id;
       req.session.username = newUser.username;
@@ -202,7 +191,7 @@ exports.login = async (req, res) => {
         userType: 2,
         isActive: true,
       });
-      if (user&&user.password && bcrypt.compareSync(req.body.password, user.password)) {
+      if (user && user.password && bcrypt.compareSync(req.body.password, user.password)) {
         req.session.userType = user.userType;
         req.session.username = user.username;
         req.session.useremail = user.email;
@@ -328,14 +317,14 @@ exports.profile = async (req, res) => {
       isActive: true,
     });
     if (userData) {
-      let  uname
-      if(userData.username){
-         uname = userData.username
-      }else{
-        uname =userData.displayName
+      let uname
+      if (userData.username) {
+        uname = userData.username
+      } else {
+        uname = userData.displayName
       }
       const [firstName, lastName] = uname.split(" ");
-      const username= firstName+" "+lastName
+      const username = firstName + " " + lastName
       res.render("user/userAccount", {
         showSidebar: true,
         userData,
@@ -567,10 +556,10 @@ exports.deleteAddress = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-  try {  
+  try {
     res.render("user/changePassword", {
       showSidebar: true,
-     
+
     });
     // Renders the login page if no session email is found
   } catch (error) {
@@ -581,26 +570,26 @@ exports.changePassword = async (req, res) => {
 exports.updatePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   try {
-      const user = await userModel
-      .findOne({ email: req.session.useremail }) ;
-      console.log(user+" user")
+    const user = await userModel
+      .findOne({ email: req.session.useremail });
+    console.log(user + " user")
 
-      if (!user) {
-          return res.status(404).json({ success:false,message: 'User not found.' });
-      }
-      const isMatch = await bcrypt.compare(oldPassword, user.password);
-      if (!isMatch) {
-          return res.status(400).json({success:false,noMatch:"ok", message: 'Old password is incorrect.' });
-      }
-      // Hash the new password
-     // const hashedPassword = await bcrypt.hash(newPassword, 10);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, noMatch: "ok", message: 'Old password is incorrect.' });
+    }
+    // Hash the new password
+    // const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-      user.password = newPassword;console.log( user.password+" final")
-      await user.save();
+    user.password = newPassword; console.log(user.password + " final")
+    await user.save();
 
-      res.status(200).json({success:true, message: 'Password updated successfully.' });
+    res.status(200).json({ success: true, message: 'Password updated successfully.' });
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server error. Please try again later.' });
+    console.error(error);
+    res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };

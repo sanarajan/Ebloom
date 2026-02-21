@@ -116,35 +116,15 @@ exports.saveProducts = async (req, res) => {
 
     if (files && files.length > 0) {
       for (const file of files) {
-        const originalPath = file.path;
-        const resizedImagePath = path.join(
-          "uploads",
-          `resized_${file.filename}`
-        );
-        const thumbnailImagePath = path.join(
-          "uploads/thumb",
-          `thumb_${file.filename}`
-        );
+        // file.path will be the Cloudinary URL
+        const cloudinaryUrl = file.path;
 
-        // Resize image
-        await sharp(originalPath)
-          .resize(800) // Adjust the width as needed
-          .toFile(resizedImagePath);
+        // Use Cloudinary URL directly for both images and thumbnails
+        // Optionally add transformations for thumbnails: cloudinaryUrl.replace('/upload/', '/upload/w_200,c_scale/')
+        const thumbnailUrl = cloudinaryUrl.replace('/upload/', '/upload/w_200,c_fill,g_auto/');
 
-        // Create thumbnail
-        await sharp(originalPath)
-          .resize(200) // Adjust the thumbnail width as needed
-          .toFile(thumbnailImagePath);
-
-        // Normalize paths to use forward slashes
-        const normalizedResizedImagePath = resizedImagePath.replace(/\\/g, "/");
-        const normalizedThumbnailImagePath = thumbnailImagePath.replace(
-          /\\/g,
-          "/"
-        );
-
-        imagePaths.push(normalizedResizedImagePath);
-        thumbnailPaths.push(normalizedThumbnailImagePath);
+        imagePaths.push(cloudinaryUrl);
+        thumbnailPaths.push(thumbnailUrl);
       }
     }
 
@@ -290,41 +270,23 @@ exports.updateProduct = async (req, res) => {
     const thumbnailPaths = [...product.thumbnailPaths]; // Keep existing thumbnails
 
     if (files && files.length > 0) {
+      // If new files are uploaded, clear the existing image arrays to replace them
+      // Or you can append them if that's desired. Assuming replacement for now as per original code's logic of spreading and then pushing.
+
+      const newImages = [];
+      const newThumbnails = [];
+
       for (const file of files) {
-        const originalPath = file.path;
-        const resizedImagePath = path.join(
-          "uploads",
-          `resized_${file.filename}`
-        );
-        const thumbnailImagePath = path.join(
-          "uploads/thumb",
-          `thumb_${file.filename}`
-        );
+        const cloudinaryUrl = file.path;
+        const thumbnailUrl = cloudinaryUrl.replace('/upload/', '/upload/w_200,c_fill,g_auto/');
 
-        // Resize image
-        await sharp(originalPath)
-          .resize(800) // Adjust the width as needed
-          .toFile(resizedImagePath);
-
-        // Create thumbnail
-        await sharp(originalPath)
-          .resize(200) // Adjust the thumbnail width as needed
-          .toFile(thumbnailImagePath);
-
-        // Normalize paths to use forward slashes
-        const normalizedResizedImagePath = resizedImagePath.replace(/\\/g, "/");
-        const normalizedThumbnailImagePath = thumbnailImagePath.replace(
-          /\\/g,
-          "/"
-        );
-
-        imagePaths.push(normalizedResizedImagePath);
-        thumbnailPaths.push(normalizedThumbnailImagePath);
+        newImages.push(cloudinaryUrl);
+        newThumbnails.push(thumbnailUrl);
       }
-    }
 
-    product.images = imagePaths;
-    product.thumbnailPaths = thumbnailPaths;
+      product.images = newImages;
+      product.thumbnailPaths = newThumbnails;
+    }
 
     // Save the updated product
     try {
@@ -462,7 +424,7 @@ exports.shopFetch = async (req, res) => {
     const skip = (page - 1) * limit;
 
     // Extract query parameters for filtering and sorting
-    const { sortBy, minPrice, maxPrice, newArrivals, category,subcategory, searchTerm } = req.query;
+    const { sortBy, minPrice, maxPrice, newArrivals, category, subcategory, searchTerm } = req.query;
 
     // Create the base product query
     const productQuery = { isActive: true };
@@ -484,7 +446,7 @@ exports.shopFetch = async (req, res) => {
     // Apply category filter
     if (category) {
       const categoriesArray = category.split(',');
-      console.log(categoriesArray +" catego")
+      console.log(categoriesArray + " catego")
       productQuery.categoryId = { $in: categoriesArray };
     }
 
@@ -504,7 +466,7 @@ exports.shopFetch = async (req, res) => {
 
     // Apply sorting
     if (sortBy) {
-      
+
       if (sortBy === 'price-low-high') {
         productsQuery = productsQuery.sort({ price: 1 });
       } else if (sortBy === 'price-high-low') {
@@ -516,14 +478,16 @@ exports.shopFetch = async (req, res) => {
 
         const orders = await Order.aggregate([
           { $unwind: "$orderedProducts" },
-          { $match: {
+          {
+            $match: {
               $and: [
                 { "orderedProducts.orderStatus": { $in: ['Order Placed', 'Pending', 'Shipped', 'Delivered'] } },
                 { paymentStatus: { $ne: 'Failed' } }
               ]
             }
           },
-          { $group: {
+          {
+            $group: {
               _id: "$orderedProducts.productId",
               totalOrdered: { $sum: "$orderedProducts.quantity" }
             }
@@ -551,14 +515,14 @@ exports.shopFetch = async (req, res) => {
 
         // Return the sorted products
         return res.json({ products, currentPage: page, totalPages: Math.ceil(products.length / limit) });
-      }  else if (sortBy === 'featured') {
+      } else if (sortBy === 'featured') {
         productsQuery = productsQuery.sort({ featured: -1, createdAt: -1 }); // Featured first, then by newest
       } else if (sortBy === 'a-to-z') {
         productsQuery = productsQuery.sort({ productName: 1 }); // Alphabetical order
       } else if (sortBy === 'z-to-a') {
         productsQuery = productsQuery.sort({ productName: -1 }); // Reverse alphabetical order
       }
-      
+
     }
     if (searchTerm) {
       productsQuery = productsQuery.find({ productName: { $regex: searchTerm, $options: 'i' } });
@@ -572,13 +536,18 @@ exports.shopFetch = async (req, res) => {
     const totalPages = Math.ceil(totalProducts / limit);
 
     // Fetch user's wishlist
-    const fetchUserId = await userModel.findOne({ email: req.session.useremail });
-    const wishlistItems = await Wishlist.find({ user: fetchUserId._id })
-      .select("products")
-      .lean();
-
-    // Convert wishlist items into a Set of product IDs
-    const wishlistProductIds = new Set(wishlistItems.flatMap((wishlist) => wishlist.products.toString()));
+    let wishlistProductIds = new Set();
+    if (req.session.userId) {
+      const fetchUserId = await userModel.findOne({ email: req.session.useremail });
+      if (fetchUserId) {
+        const wishlistItems = await Wishlist.find({ user: fetchUserId._id })
+          .select("products")
+          .lean();
+        wishlistProductIds = new Set(wishlistItems.flatMap((wishlist) => wishlist.products.toString()));
+      }
+    } else if (req.session.wishlist) {
+      wishlistProductIds = new Set(req.session.wishlist.map(id => id.toString()));
+    }
 
     // Fetch offers in parallel
     const productIds = products.map(p => p._id);
@@ -614,7 +583,7 @@ exports.shopFetch = async (req, res) => {
         ? product.price - Math.floor((product.price * highestOffer.offerPercentage) / 100)
         : product.price;
     });
-console.log(products)
+    console.log(products)
     res.json({ products, currentPage: page, totalPages });
   } catch (error) {
     console.error("Error in shopFetch controller:", error);
@@ -651,54 +620,56 @@ exports.productDetails = async (req, res) => {
       ([key, value]) => ({ key, value })
     );
 
-    const fetchUserId = await userModel.findOne({
-      email: req.session.useremail,
-    });
-    //wishlist
-    const userId = fetchUserId._id;
+    let isInWishlist = false;
+    if (req.session.userId) {
+      const fetchUserId = await userModel.findOne({
+        email: req.session.useremail,
+      });
+      if (fetchUserId) {
+        const userId = fetchUserId._id;
+        const wishlistItems = await Wishlist.findOne({ user: userId, products: product._id }).lean();
+        if (wishlistItems) {
+          isInWishlist = true;
+        }
+      }
+    } else if (req.session.wishlist) {
+      isInWishlist = req.session.wishlist.includes(product._id.toString());
+    }
+    product.inWishlist = isInWishlist;
+    const productOffer = await Offer.findOne({
+      offerFor: 'product',
+      products: prodId,
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    }).lean();
 
-    const wishlistItems = await Wishlist.findOne({ user: userId })
-    .select("products")
-    .lean();  
-  let isInWishlist = false;  
-  if (wishlistItems) {
-    isInWishlist = wishlistItems.products.toString() === product._id.toString();
-  }  
-  product.inWishlist = isInWishlist;
-  const productOffer = await Offer.findOne({
-    offerFor: 'product',
-    products: prodId,
-    startDate: { $lte: new Date() },
-    endDate: { $gte: new Date() },
-  }).lean();
+    // Fetch offers for the category
+    const categoryOffer = await Offer.findOne({
+      offerFor: 'category',
+      categories: product.categoryId,
+      startDate: { $lte: new Date() },
+      endDate: { $gte: new Date() },
+    }).lean();
 
-  // Fetch offers for the category
-  const categoryOffer = await Offer.findOne({
-    offerFor: 'category',
-    categories: product.categoryId,
-    startDate: { $lte: new Date() },
-    endDate: { $gte: new Date() },
-  }).lean();
-
-  // Determine the highest offer
-  let highestOffer = null;
-  let saved =0
-  if (productOffer && categoryOffer) {
-    highestOffer = productOffer.offerPercentage > categoryOffer.offerPercentage
-      ? productOffer
-      : categoryOffer;
-  } else {
-    highestOffer = productOffer || categoryOffer;
-  }
-   let offerExist =false;
-  // Calculate the offer price (if there is an offer)
-  if (highestOffer) {
-    product.offerPercentage = highestOffer.offerPercentage;
-    product.offerPrice = product.price - Math.floor((product.price * (highestOffer.offerPercentage / 100)));
-    offerExist =true
-    product.discountPercentage =highestOffer.offerPercentage
-    product.saved = product.price-product.offerPrice
-  }
+    // Determine the highest offer
+    let highestOffer = null;
+    let saved = 0
+    if (productOffer && categoryOffer) {
+      highestOffer = productOffer.offerPercentage > categoryOffer.offerPercentage
+        ? productOffer
+        : categoryOffer;
+    } else {
+      highestOffer = productOffer || categoryOffer;
+    }
+    let offerExist = false;
+    // Calculate the offer price (if there is an offer)
+    if (highestOffer) {
+      product.offerPercentage = highestOffer.offerPercentage;
+      product.offerPrice = product.price - Math.floor((product.price * (highestOffer.offerPercentage / 100)));
+      offerExist = true
+      product.discountPercentage = highestOffer.offerPercentage
+      product.saved = product.price - product.offerPrice
+    }
     //end wishlist
     res.render("user/productDetails", {
       product,
@@ -793,21 +764,27 @@ exports.productsSearch = async (req, res) => {
       ...product,
       price: product.price.toString(),
     }));
-    const fetchUserId = await userModel.findOne({
-      email: req.session.useremail,
-    });
-    const userId = fetchUserId._id;
+    let wishlistProductIds = new Set();
+    if (req.session.userId) {
+      const fetchUserId = await userModel.findOne({
+        email: req.session.useremail,
+      });
+      if (fetchUserId) {
+        const userId = fetchUserId._id;
+        const wishlistItems = await Wishlist.findOne({ user: userId })
+          .select("products")
+          .lean();
 
-    const wishlistItems = await Wishlist.findOne({ user: userId })
-      .select("products")
-      .lean();
-
-    // Initialize wishlistProductIds as an empty set if no wishlist found
-    const wishlistProductIds = new Set(
-      wishlistItems && wishlistItems.products
-        ? wishlistItems.products.map((productId) => productId.toString())
-        : []
-    );
+        // Initialize wishlistProductIds as an empty set if no wishlist found
+        wishlistProductIds = new Set(
+          wishlistItems && wishlistItems.products
+            ? wishlistItems.products.map((productId) => productId.toString())
+            : []
+        );
+      }
+    } else if (req.session.wishlist) {
+      wishlistProductIds = new Set(req.session.wishlist.map(id => id.toString()));
+    }
 
     formattedProducts.forEach((product) => {
       if (product.quantity <= 0) {
